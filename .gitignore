@@ -1,0 +1,16 @@
+# Frontend
+frontend/node_modules
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/build
+frontend/.firebase
+frontend/.firebaserc
+frontend/.agents
+frontend/skills-lock.json
+
+# Backend
+backend/node_modules
+backend/.env
+backend/nodemon.json
+backend/uploads/images

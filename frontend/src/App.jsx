@@ -1,0 +1,80 @@
+import React, { Suspense } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate
+} from 'react-router-dom';
+
+// import Users from './user/pages/Users';
+// import NewPlace from '../src/places/pages/NewPlaces'
+// import UserPlaces from './places/pages/UserPlaces';
+// import UpdatePlace from './places/pages/UpdatePlace';
+// import Auth from './user/pages/Auth';
+import MainNavigation from './shared/components/Navigation/MainNavigation';
+import { AuthContext } from './shared/context/auth-context';
+import { useAuth } from './shared/hooks/auth-hook';
+import LoadingSpinner from './shared/components/UIElements/LoadingSpinner';
+
+const Users = React.lazy(()=> import('./user/pages/Users')); // lazy loading for code splitting
+const NewPlace = React.lazy(()=> import('./places/pages/NewPlaces')); // lazy loading for code splitting
+const UserPlaces = React.lazy(()=> import('./places/pages/UserPlaces')); // lazy loading for code splitting
+const UpdatePlace = React.lazy(()=> import('./places/pages/UpdatePlace')); // lazy loading for code splitting
+const Auth = React.lazy(()=> import('./user/pages/Auth')); // lazy loading for code splitting
+
+const App = () => {
+  const { token, login, logout, userId }= useAuth();
+
+  let routes;
+
+  if (token) {
+    routes = (
+      <Routes>
+        <Route path="/" element={<Users/>}/>
+        <Route path="/:userId/places" element={<UserPlaces/>}/>
+        <Route path="/places/new" element={<NewPlace/>}/>
+        <Route path="/places/:placeId" element={<UpdatePlace/>}/>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  } else {
+    routes = (
+      <Routes>
+        <Route path="/" element={<Users/>}/>
+        <Route path="/:userId/places" element={<UserPlaces/>}/>
+        <Route path="/auth" element={<Auth/>}/>
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        isLoggedIn: !!token,
+        token: token,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
+    >
+      <Router>
+        <MainNavigation />
+        <main className="pt-16">
+          <Suspense
+            fallback={
+              <div center="flex justify-center items-center h-screen">
+                <LoadingSpinner />
+              </div>
+              // or center = "true"
+            }
+          >
+            {routes}
+          </Suspense>
+        </main>
+      </Router>
+    </AuthContext.Provider>
+  );
+};
+
+export default App;
