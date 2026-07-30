@@ -62,10 +62,18 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
         footerClass="text-right"
         footer={
           <>
-            <Button inverse onClick={cancelDeleteHandler}>
+            <Button 
+              inverse 
+              onClick={cancelDeleteHandler}
+              className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
+            >
               CANCEL
             </Button>
-            <Button danger onClick={confirmDeleteHandler}>
+            <Button 
+              danger 
+              onClick={confirmDeleteHandler}
+              className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
+            >
               DELETE
             </Button>
           </>
@@ -96,16 +104,29 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
           </div>
           
           <div className="p-4 text-center border-t border-[#ccc] [&>*]:m-2">
-            <Button inverse onClick={openMapHandler}>
+            <Button 
+            inverse 
+            onClick={openMapHandler}
+            className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
+            >
               VIEW ON MAP
             </Button>
             
             {auth.userId === creatorId && (
-              <Button to={`/places/${id}`}>EDIT</Button>
+              <Button 
+                to={`/places/${id}`}
+                className="rounded border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+              >
+                EDIT
+              </Button>
             )}
 
             {auth.userId === creatorId && (
-              <Button danger onClick={showDeleteWarningHandler}>
+              <Button 
+                danger 
+                onClick={showDeleteWarningHandler}
+                className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
+              >
                 DELETE
               </Button>
             )}
