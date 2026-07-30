@@ -32,9 +32,9 @@ function MainNavigation () {
           className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
           onClick={openDrawerHandler}
         >
-          <span className="block w-12 h-[2.5px] bg-[#606366]" />
-          <span className="block w-12 h-[2.5px] bg-[#606366]" />
-          <span className="block w-12 h-[2.5px] bg-[#606366]" />
+          <span className="block w-12 h-[2.5px] bg-[#606366] rounded" />
+          <span className="block w-12 h-[2.5px] bg-[#606366] rounded" />
+          <span className="block w-12 h-[2.5px] bg-[#606366] rounded" />
         </button>
         <h1 className="text-white">
           <Link to="/" className="no-underline">

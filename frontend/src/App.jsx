@@ -39,6 +39,7 @@ function RootLayout() {
 // "/" shows Auth when logged out, Users when logged in
 function HomeRoute() {
   const { token } = useContext(AuthContext);
+  console.log('HomeRoute token:', token); // temp debug
   return token ? <Users /> : <Auth />;
 }
 

@@ -136,20 +136,25 @@ function Auth() {
                 // label="Your Name "
                 validators={[VALIDATOR_REQUIRE()]}
                 // errorText="Please enter a name."
-                placeholder='Name'
+                placeholder="Name"
                 onInput={inputHandler}
                 className="w-full rounded-full border bg-[#FFFFFF] border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
               />
             )}
             {!isLoginMode && (
-              <ImageUpload center id="image" onInput={inputHandler} errorText="Please provide an image" />
+              <ImageUpload
+                center
+                id="image"
+                onInput={inputHandler}
+                errorText="Please provide an image"
+              />
             )}
             <Input
               element="input"
               id="email"
               type="email"
               // label="Email or mobile number"
-              placeholder='Email'
+              placeholder="Email"
               validators={[VALIDATOR_EMAIL()]}
               // errorText="Please enter a valid email address."
               onInput={inputHandler}
@@ -160,7 +165,7 @@ function Auth() {
               id="password"
               type="password"
               // label="Password"
-              placeholder='Password'
+              placeholder="Password"
               validators={[VALIDATOR_MINLENGTH(6)]}
               // errorText="Please enter a valid password, at least 6 characters."
               onInput={inputHandler}
@@ -174,12 +179,13 @@ function Auth() {
               {isLoginMode ? "Log In" : "Sign Up"}
             </Button>
           </form>
-
-          <div className="text-center my-4">
-            <a href="#" className="text-blue-600 text-sm hover:underline">
-              Forgot password?
-            </a>
-          </div>
+          {isLoginMode && (
+            <div className="text-center my-4">
+              <a href="#" className="text-blue-600 text-sm hover:underline">
+                Forgot password?
+              </a>
+            </div>
+          )}
 
           <hr className="my-6 border-gray-200" />
 

@@ -124,6 +124,7 @@ function UpdatePlace() {
             onInput={inputHandler}
             initialValue={loadedPlace.title}
             initialValid={true}
+            className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
           />
           <Input
             id="description"
@@ -134,8 +135,13 @@ function UpdatePlace() {
             onInput={inputHandler}
             initialValue={loadedPlace.description}
             initialValid={true}
+            className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
           />
-          <Button type="submit" disabled={!formState.isValid}>
+          <Button 
+            type="submit" 
+            disabled={!formState.isValid}
+            className="w-full rounded-full border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+          >
             UPDATE PLACE
           </Button>
         </form>

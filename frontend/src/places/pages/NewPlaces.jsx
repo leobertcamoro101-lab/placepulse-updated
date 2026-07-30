@@ -76,33 +76,42 @@ function NewPlace () {
         id="title"
         element="input"
         type="text"
-        label="Title"
+        // label="Title"
+        placeholder='Title'
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid title."
         onInput={inputHandler}
+        className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
       />
       <Input
         id="description"
         element="textarea"
-        label="Description"
+        // label="Description"
         validators={[VALIDATOR_MINLENGTH(5)]}
         errorText="Please enter a valid description (at least 5 characters)."
         onInput={inputHandler}
+        className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
       />
       <Input
         id="address"
         element="input"
-        label="Address"
+        // label="Address"
+        placeholder='Address'
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid address."
         onInput={inputHandler}
+        className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
       />
       <ImageUpload
         id="image"
         onInput={inputHandler}
         errorText="Please provide an image."
       />
-      <Button type="submit" disabled={!formState.isValid}>
+      <Button 
+        type="submit" 
+        disabled={!formState.isValid}
+        className="w-full rounded-full border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+      >
         ADD PLACE
       </Button>
     </form>
