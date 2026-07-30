@@ -1,52 +1,79 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useContext } from 'react';
 import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+  useLocation
 } from 'react-router-dom';
 
-// import Users from './user/pages/Users';
-// import NewPlace from '../src/places/pages/NewPlaces'
-// import UserPlaces from './places/pages/UserPlaces';
-// import UpdatePlace from './places/pages/UpdatePlace';
-// import Auth from './user/pages/Auth';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import { AuthContext } from './shared/context/auth-context';
 import { useAuth } from './shared/hooks/auth-hook';
 import LoadingSpinner from './shared/components/UIElements/LoadingSpinner';
 
-const Users = React.lazy(()=> import('./user/pages/Users')); // lazy loading for code splitting
-const NewPlace = React.lazy(()=> import('./places/pages/NewPlaces')); // lazy loading for code splitting
-const UserPlaces = React.lazy(()=> import('./places/pages/UserPlaces')); // lazy loading for code splitting
-const UpdatePlace = React.lazy(()=> import('./places/pages/UpdatePlace')); // lazy loading for code splitting
-const Auth = React.lazy(()=> import('./user/pages/Auth')); // lazy loading for code splitting
+const Users = React.lazy(() => import('./user/pages/Users'));
+const NewPlace = React.lazy(() => import('./places/pages/NewPlaces'));
+const UserPlaces = React.lazy(() => import('./places/pages/UserPlaces'));
+const UpdatePlace = React.lazy(() => import('./places/pages/UpdatePlace'));
+const Auth = React.lazy(() => import('./user/pages/Auth'));
+
+// Layout shared by every route — handles nav visibility + Suspense fallback
+function RootLayout() {
+  const location = useLocation();
+  const { token } = useContext(AuthContext);
+  const hideNav = location.pathname === '/' && !token;
+
+  return (
+    <>
+      {!hideNav && <MainNavigation />}
+      <main className={hideNav ? '' : 'pt-16'}>
+        <Suspense fallback={<div className="flex justify-center items-center h-screen"><LoadingSpinner/></div>}>
+          <Outlet />
+        </Suspense>
+      </main>
+    </>
+  );
+}
+
+// "/" shows Auth when logged out, Users when logged in
+function HomeRoute() {
+  const { token } = useContext(AuthContext);
+  return token ? <Users /> : <Auth />;
+}
+
+// Wrap any route that should only be reachable while logged in
+function RequireAuth({ children }) {
+  const { token } = useContext(AuthContext);
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <HomeRoute /> },
+      { path: 'users', element: <Users /> },
+      { path: ':userId/places', element: <UserPlaces /> },
+      {
+        path: 'places/new',
+        element: <RequireAuth><NewPlace /></RequireAuth>
+      },
+      {
+        path: 'places/:placeId',
+        element: <RequireAuth><UpdatePlace /></RequireAuth>
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
+    ],
+  },
+]);
 
 const App = () => {
-  const { token, login, logout, userId }= useAuth();
-
-  let routes;
-
-  if (token) {
-    routes = (
-      <Routes>
-        <Route path="/" element={<Users/>}/>
-        <Route path="/:userId/places" element={<UserPlaces/>}/>
-        <Route path="/places/new" element={<NewPlace/>}/>
-        <Route path="/places/:placeId" element={<UpdatePlace/>}/>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    );
-  } else {
-    routes = (
-      <Routes>
-        <Route path="/" element={<Users/>}/>
-        <Route path="/:userId/places" element={<UserPlaces/>}/>
-        <Route path="/auth" element={<Auth/>}/>
-        <Route path="*" element={<Navigate to="/auth" replace />} />
-      </Routes>
-    );
-  }
+  const { token, login, logout, userId } = useAuth();
 
   return (
     <AuthContext.Provider
@@ -58,21 +85,7 @@ const App = () => {
         logout: logout,
       }}
     >
-      <Router>
-        <MainNavigation />
-        <main className="pt-16">
-          <Suspense
-            fallback={
-              <div center="flex justify-center items-center h-screen">
-                <LoadingSpinner />
-              </div>
-              // or center = "true"
-            }
-          >
-            {routes}
-          </Suspense>
-        </main>
-      </Router>
+      <RouterProvider router={router} />
     </AuthContext.Provider>
   );
 };

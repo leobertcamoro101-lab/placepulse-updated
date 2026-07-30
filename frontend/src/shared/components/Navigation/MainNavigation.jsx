@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import LogoImg from '../../../assets/Placepulse-logo.png'
 
 import MainHeader from './MainHeader';
 import NavLinks from './NavLinks';
@@ -31,16 +32,16 @@ function MainNavigation () {
           className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
           onClick={openDrawerHandler}
         >
-          <span className="block w-12 h-[2.5px] bg-white" />
-          <span className="block w-12 h-[2.5px] bg-white" />
-          <span className="block w-12 h-[2.5px] bg-white" />
+          <span className="block w-12 h-[2.5px] bg-[#606366]" />
+          <span className="block w-12 h-[2.5px] bg-[#606366]" />
+          <span className="block w-12 h-[2.5px] bg-[#606366]" />
         </button>
         <h1 className="text-white">
-          <Link to="/" className="no-underline text-white">
-            YourPlaces
+          <Link to="/" className="no-underline">
+            <img src={LogoImg} alt="PlacePulse" className="h-10" />
           </Link>
         </h1>
-        <nav className="hidden md:block">
+        <nav className="hidden md:flex md:absolute md:left-1/2 md:-translate-x-1/2">
           <NavLinks />
         </nav>
       </MainHeader>

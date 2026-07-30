@@ -1,6 +1,7 @@
 import { useReducer, useEffect } from 'react';
 
 import { validate } from '../../utils/validators';
+import { cn } from '../../utils/cn'; // adjust path to match your folder structure
 
 const inputReducer = (state, action) => {
   switch (action.type) {
@@ -32,7 +33,8 @@ function Input ({
   placeholder,
   rows = 3,
   label,
-  errorText
+  errorText,
+  className
 }) {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: initialValue,
@@ -60,15 +62,17 @@ function Input ({
     });
   };
 
-  // Determine error layout conditions
   const isInvalid = !isValid && isTouched;
 
-  // Shared classes for input and textarea base/focus/invalid states
   const baseInputClasses = 'block w-full font-inherit p-[0.15rem_0.25rem] border outline-none transition-colors duration-200';
   const normalInputClasses = 'border-[#ccc] bg-[#f8f8f8] focus:bg-[#ebebeb] focus:border-[#510077]';
   const invalidInputClasses = 'border-red-500 bg-[#ffd1d1]';
-  
-  const computedInputClasses = `${baseInputClasses} ${isInvalid ? invalidInputClasses : normalInputClasses}`;
+
+  const computedInputClasses = cn(
+    baseInputClasses,
+    isInvalid ? invalidInputClasses : normalInputClasses,
+    className
+  );
 
   const inputElement =
     elementType === 'input' ? (

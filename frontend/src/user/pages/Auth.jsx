@@ -119,57 +119,81 @@ function Auth() {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      <Card className="w-[90%] max-w-[25rem] my-28 mx-auto text-center p-4">
-        {isLoading && <LoadingSpinner asOverlay />}
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Login Required
-        </h2>
-        <hr className="border-gray-200 my-4" />
-        <form onSubmit={authSubmitHandler} className="mb-4">
-          {!isLoginMode && (
+      <div className="min-h-screen flex items-start justify-center pt-20 bg-white">
+        <Card className="w-full max-w-[28rem] px-6 py-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {isLoginMode ? "Log into PlacePulse" : "Create your account"}
+          </h2>
+
+          {isLoading && <LoadingSpinner asOverlay />}
+
+          <form onSubmit={authSubmitHandler}>
+            {!isLoginMode && (
+              <Input
+                element="input"
+                id="name"
+                type="text"
+                // label="Your Name "
+                validators={[VALIDATOR_REQUIRE()]}
+                // errorText="Please enter a name."
+                placeholder='Name'
+                onInput={inputHandler}
+                className="w-full rounded-full border bg-[#FFFFFF] border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
+              />
+            )}
+            {!isLoginMode && (
+              <ImageUpload center id="image" onInput={inputHandler} errorText="Please provide an image" />
+            )}
             <Input
               element="input"
-              id="name"
-              type="text"
-              label="Your Name"
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a name."
+              id="email"
+              type="email"
+              // label="Email or mobile number"
+              placeholder='Email'
+              validators={[VALIDATOR_EMAIL()]}
+              // errorText="Please enter a valid email address."
               onInput={inputHandler}
+              className="w-full rounded-full bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
             />
-          )}
-          {!isLoginMode && (
-            <ImageUpload 
-              center 
-              id="image" 
-              onInput={inputHandler} 
-              errorText="Please provide an image"/>
-          )}
-          <Input
-            element="input"
-            id="email"
-            type="email"
-            label="E-Mail"
-            validators={[VALIDATOR_EMAIL()]}
-            errorText="Please enter a valid email address."
-            onInput={inputHandler}
-          />
-          <Input
-            element="input"
-            id="password"
-            type="password"
-            label="Password"
-            validators={[VALIDATOR_MINLENGTH(6)]}
-            errorText="Please enter a valid password, at least 6 characters."
-            onInput={inputHandler}
-          />
-          <Button type="submit" disabled={!formState.isValid}>
-            {isLoginMode ? "LOGIN" : "SIGNUP"}
-          </Button>
-        </form>
-        <Button inverse onClick={switchModeHandler}>
-          SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
-        </Button>
-      </Card>
+            <Input
+              element="input"
+              id="password"
+              type="password"
+              // label="Password"
+              placeholder='Password'
+              validators={[VALIDATOR_MINLENGTH(6)]}
+              // errorText="Please enter a valid password, at least 6 characters."
+              onInput={inputHandler}
+              className="w-full rounded-full bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-4 text-base focus:outline-none focus:border-blue-500"
+            />
+            <Button
+              type="submit"
+              disabled={!formState.isValid}
+              className="w-full rounded-full border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+            >
+              {isLoginMode ? "Log In" : "Sign Up"}
+            </Button>
+          </form>
+
+          <div className="text-center my-4">
+            <a href="#" className="text-blue-600 text-sm hover:underline">
+              Forgot password?
+            </a>
+          </div>
+
+          <hr className="my-6 border-gray-200" />
+
+          <div className="flex justify-center">
+            <Button
+              inverse
+              onClick={switchModeHandler}
+              className="rounded-full border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
+            >
+              {isLoginMode ? "Create New Account" : "Switch to Login"}
+            </Button>
+          </div>
+        </Card>
+      </div>
     </>
   );
 }

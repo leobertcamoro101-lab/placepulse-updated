@@ -60,7 +60,11 @@ function ImageUpload({ id, onInput, errorText }) {
             <p className="text-sm text-gray-500 text-center px-2">Please pick an image.</p>
           )}
         </div>
-        <Button type="button" onClick={pickImageHandler}>
+        <Button 
+          type="button" 
+          onClick={pickImageHandler}
+          className="rounded-full border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+        >
           PICK IMAGE
         </Button>
       </div>
