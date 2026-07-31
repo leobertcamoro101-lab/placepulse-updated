@@ -27,7 +27,7 @@ function MainNavigation () {
         </nav>
       </SideDrawer>
 
-      <MainHeader>
+      <MainHeader >
         <button
           className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
           onClick={openDrawerHandler}

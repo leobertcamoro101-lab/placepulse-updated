@@ -68,7 +68,7 @@ const ModalOverlay = ({
       onTransitionEnd={handleTransitionEnd}
     >
       <header
-        className={`shrink-0 w-full px-3 py-3 sm:px-4 sm:py-4 bg-[#2a006e] text-white rounded-t-lg ${headerClass || ""}`}
+        className={`shrink-0 w-full px-3 py-3 sm:px-4 sm:py-4 bg-blue-900 text-white rounded-t-lg ${headerClass || ""}`}
       >
         <h2 className="mx-1 my-1 text-base sm:text-lg md:text-xl font-semibold">{header}</h2>
       </header>

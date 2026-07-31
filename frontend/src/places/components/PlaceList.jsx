@@ -5,12 +5,17 @@ import Button from '../../shared/components/FormElements/Button';
 function PlaceList ({ items, onDeletePlace }) {
   if (items.length === 0) {
     return (
-      <div className="list-none m-auto p-0 w-90% max-w-2xl mx-auto px-4">
-        <Card>
-          <h2>No places found. Maybe create one?</h2>
-          <Button to="/places/new">Share Place</Button>
-        </Card>
-      </div>
+      <div className="flex justify-center items-center min-h-[50vh] w-full px-4">
+      <Card className="text-center p-6 max-w-md w-full">
+        <h2 className="text-lg text-gray-800 mb-4">No places found. Maybe create one?</h2>
+        <Button 
+          to="/places/new" 
+          className="rounded-full bg-blue-600 hover:bg-blue-700 border-blue-600 text-white font-semibold px-6 py-3"
+        >
+          Share Place
+        </Button>
+      </Card>
+    </div>
     );
   }
 

@@ -7,7 +7,14 @@ function ErrorModal  ({ onClear, error })  {
       onCancel={onClear}
       header="An Error Occurred!"
       show={!!error}
-      footer={<Button onClick={onClear}>Okay</Button>}
+      footer={
+        <Button 
+          onClick={onClear}
+          className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
+        >
+          Okay
+        </Button>
+      }
     >
       <p>{error}</p>
     </Modal>

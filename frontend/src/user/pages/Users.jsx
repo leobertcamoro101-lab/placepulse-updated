@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import UsersList from "../components/UserList";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
-import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+// import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 
 function Users() {
@@ -32,11 +32,11 @@ function Users() {
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-      {isLoading && (
-        <div className="center">
+      {/* {isLoading && (
+        <div className="flex justify-center items-center my-8">
           <LoadingSpinner />
         </div>
-      )}
+      )} */}
       {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
     </>
   );

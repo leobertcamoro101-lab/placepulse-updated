@@ -9,6 +9,7 @@ import {
 
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import { AuthContext } from './shared/context/auth-context';
+import { LoadingProvider } from './shared/context/LoadingProvider'; // wired for LoadingProvider
 import { useAuth } from './shared/hooks/auth-hook';
 import LoadingSpinner from './shared/components/UIElements/LoadingSpinner';
 
@@ -77,6 +78,7 @@ const App = () => {
   const { token, login, logout, userId } = useAuth();
 
   return (
+    <LoadingProvider>
     <AuthContext.Provider
       value={{
         isLoggedIn: !!token,
@@ -88,6 +90,7 @@ const App = () => {
     >
       <RouterProvider router={router} />
     </AuthContext.Provider>
+    </LoadingProvider>
   );
 };
 

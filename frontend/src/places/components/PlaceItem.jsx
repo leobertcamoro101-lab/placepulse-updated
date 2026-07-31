@@ -40,14 +40,20 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
   return (
     <>
       {/* Map Modal */}
-      <ErrorModal error={error} onClear={clearError}/>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
         header={address}
         contentClass="p-0"
         footerClass="text-right"
-        footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
+        footer={
+          <Button 
+            onClick={closeMapHandler}
+            className="rounded border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+          >
+            CLOSE
+          </Button>}
       >
         <div className="h-60 w-full">
           <Map center={coordinates} zoom={16} />
@@ -62,15 +68,15 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
         footerClass="text-right"
         footer={
           <>
-            <Button 
-              inverse 
+            <Button
+              inverse
               onClick={cancelDeleteHandler}
               className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
             >
               CANCEL
             </Button>
-            <Button 
-              danger 
+            <Button
+              danger
               onClick={confirmDeleteHandler}
               className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
             >
@@ -87,33 +93,33 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
       {/* Place Item Card */}
       <li className="my-4 list-none">
         <Card className="p-0">
-          {isLoading && <LoadingSpinner asOverlay/>}
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="h-50 w-full mr-6 md:h-80">
-            <img 
+            <img
               // src={`${import.meta.env.VITE_BACKEND_ASSET_URL}/${props.image}`} // removed switched to Cloudinary, VITE_BACKEND_ASSET_URL is no longer needed
-              src={image} 
-              alt={title} 
+              src={image}
+              alt={title}
               className="h-full w-full object-cover"
             />
           </div>
-          
+
           <div className="p-4 text-center">
             <h2 className="m-0 mb-2">{title}</h2>
             <h3 className="m-0 mb-2">{address}</h3>
             <p className="m-0 mb-2">{description}</p>
           </div>
-          
+
           <div className="p-4 text-center border-t border-[#ccc] [&>*]:m-2">
-            <Button 
-            inverse 
-            onClick={openMapHandler}
-            className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
+            <Button
+              inverse
+              onClick={openMapHandler}
+              className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
             >
               VIEW ON MAP
             </Button>
-            
+
             {auth.userId === creatorId && (
-              <Button 
+              <Button
                 to={`/places/${id}`}
                 className="rounded border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
               >
@@ -122,8 +128,8 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
             )}
 
             {auth.userId === creatorId && (
-              <Button 
-                danger 
+              <Button
+                danger
                 onClick={showDeleteWarningHandler}
                 className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
               >

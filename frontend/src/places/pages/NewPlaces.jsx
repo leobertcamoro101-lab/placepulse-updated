@@ -68,7 +68,7 @@ function NewPlace () {
     <>
     <ErrorModal error={error} onClear={clearError}/>
     <form 
-      className="list-none mx-auto p-4 w-[90%] max-w-[40rem] shadow-[0_2px_8px_rgba(0,0,0,0.26)] rounded-six bg-white" 
+      className="list-none mx-auto p-4 w-[90%] max-w-[40rem] shadow-[0_2px_8px_rgba(0,0,0,0.26)] rounded-six bg-white m-4" 
       onSubmit={placeSubmitHandler}
     >
       {isLoading && <LoadingSpinner asOverlay/>}

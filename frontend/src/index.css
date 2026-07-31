@@ -14,6 +14,13 @@ body {
   background: #F2F4F7;
 }
 
+#nprogress .bar {
+  background: #ff0055 !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #ff0055, 0 0 5px #ff0055 !important;
+}
+
 /* .slide-in-left-enter {
   transform: translateX(-100%);
 }

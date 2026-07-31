@@ -90,7 +90,7 @@ function UpdatePlace() {
   };
   if (isLoading) {
     return (
-      <div className="center">
+      <div className="flex justify-center items-center my-8">
         <LoadingSpinner />
       </div>
     );
@@ -98,7 +98,7 @@ function UpdatePlace() {
 
   if (!loadedPlace && !error) {
     return (
-      <div className="center">
+      <div className="flex justify-center items-center my-8">
         <Card>
           <h2>Could not find place!</h2>
         </Card>
@@ -111,7 +111,7 @@ function UpdatePlace() {
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedPlace && (
         <form
-          className="list-none mx-auto p-4 w-[90%] max-w-[40rem] shadow-[0_2px_8px_rgba(0,0,0,0.26)] rounded-six bg-white"
+          className="list-none mx-auto p-4 w-[90%] max-w-[40rem] shadow-[0_2px_8px_rgba(0,0,0,0.26)] rounded-six bg-white m-4"
           onSubmit={placeUpdateSubmitHandler}
         >
           <Input
@@ -137,13 +137,23 @@ function UpdatePlace() {
             initialValid={true}
             className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
           />
-          <Button 
-            type="submit" 
-            disabled={!formState.isValid}
-            className="w-full rounded-full border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
-          >
-            UPDATE PLACE
-          </Button>
+          <div className="shrink-0 px-3 py-3 sm:px-4 sm:py-4 flex justify-end">
+            <Button
+              inverse
+              to={`/${auth.userId}/places/`}
+              className=" border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
+            >
+              CANCEL
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={!formState.isValid}
+              className=" border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
+            >
+              UPDATE PLACE
+            </Button>
+          </div>
+          
         </form>
       )}
     </>
