@@ -100,12 +100,11 @@ const signup = async (req, res, next) => {
     res.status(201).json({
       userId: createdUser.id,
       email: createdUser.email,
+      name: createdUser.name,
+      image: createdUser.image,
       token: token,
     });
-    // remove because added token
-    // res
-    // .status(201)
-    // .json({ user: createdUser.toObject({ getters: true }) });
+    
 };
 
 const login = async (req, res, next) => {
@@ -122,7 +121,7 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  if (!existingUser) {                              // remove inside the parenthesis because the password is already hashed "|| existingUser.password !== password"
+  if (!existingUser) {                              
     const error = new HttpError(
       "Invalid credentials, could not log you in",
       403,
@@ -165,13 +164,10 @@ const login = async (req, res, next) => {
   res.json({
     userId: existingUser.id,
     email: existingUser.email,
+    name: existingUser.name,
+    image: existingUser.image,
     token: token
   });
-
-  // res.json({
-  //   message: "Logged in!",
-  //   user: existingUser.toObject({ getters: true }),
-  // });
 };
 
 exports.getUsers = getUsers;

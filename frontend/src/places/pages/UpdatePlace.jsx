@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UIElements/Card";
+import Avatar from "../../shared/components/UIElements/Avatar";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import {
@@ -23,14 +24,8 @@ function UpdatePlace() {
 
   const [formState, inputHandler, setFormData] = useForm(
     {
-      title: {
-        value: "",
-        isValid: false,
-      },
-      description: {
-        value: "",
-        isValid: false,
-      },
+      title: { value: "", isValid: false },
+      description: { value: "", isValid: false },
     },
     false,
   );
@@ -42,26 +37,17 @@ function UpdatePlace() {
           `${import.meta.env.VITE_BACKEND_URL}/places/${placeId}`,
         );
         if (responseData) {
-          // i put this inside the if because of component http-hook.js abort-handling
-          // Fix — guard against responseData being undefined before using it:
-          setLoadedPlace(responseData.place); // why place because of the backend "res.json({ place: place.toObject({ getters: true }) });"
+          setLoadedPlace(responseData.place);
           setFormData(
             {
-              title: {
-                value: responseData.title,
-                isValid: true,
-              },
-              description: {
-                value: responseData.description,
-                isValid: true,
-              },
+              title: { value: responseData.place.title, isValid: true },
+              description: { value: responseData.place.description, isValid: true },
             },
             true,
           );
         }
       } catch (err) {
-        // the catch is empty because it's set when using useHttpClient inside http-hook.js file
-        console.log(err) // to get rid or curly marked (to know the error message in console)
+        console.log(err);
       }
     };
     fetchPlace();
@@ -84,10 +70,10 @@ function UpdatePlace() {
       );
       navigate("/" + auth.userId + "/places");
     } catch (err) {
-      // the catch is empty because it's set when using useHttpClient inside http-hook.js file
-      console.log(err); // to get rid or curly marked (to know the error message in console)
+      console.log(err);
     }
   };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center my-8">
@@ -110,51 +96,59 @@ function UpdatePlace() {
     <>
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedPlace && (
-        <form
-          className="list-none mx-auto p-4 w-[90%] max-w-[40rem] shadow-[0_2px_8px_rgba(0,0,0,0.26)] rounded-six bg-white m-4"
-          onSubmit={placeUpdateSubmitHandler}
-        >
-          <Input
-            id="title"
-            element="input"
-            type="text"
-            label="Title"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid title."
-            onInput={inputHandler}
-            initialValue={loadedPlace.title}
-            initialValid={true}
-            className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
-          />
-          <Input
-            id="description"
-            element="textarea"
-            label="Description"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="Please enter a valid description (min. 5 characters)."
-            onInput={inputHandler}
-            initialValue={loadedPlace.description}
-            initialValid={true}
-            className="w-full rounded bg-[#FFFFFF] border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
-          />
-          <div className="shrink-0 px-3 py-3 sm:px-4 sm:py-4 flex justify-end">
-            <Button
-              inverse
-              to={`/${auth.userId}/places/`}
-              className=" border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
-            >
-              CANCEL
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={!formState.isValid}
-              className=" border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
-            >
-              UPDATE PLACE
-            </Button>
+        <Card className="w-[90%] max-w-[35rem] mx-auto my-4 p-0 overflow-visible">
+          <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 m-0">Edit Post</h2>
           </div>
-          
-        </form>
+
+          <div className="flex items-center gap-3 px-4 pt-4">
+            <div className="w-10 h-10">
+              <Avatar image={auth.image} alt={auth.name || 'You'} width="40px" />
+            </div>
+            <p className="font-semibold text-gray-900 m-0">{auth.name}</p>
+          </div>
+
+          <form onSubmit={placeUpdateSubmitHandler} className="px-4 pb-4">
+            <Input
+              id="title"
+              element="input"
+              type="text"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a valid title."
+              onInput={inputHandler}
+              initialValue={loadedPlace.title}
+              initialValid={true}
+              className="w-full !border-0 !px-0 !py-2 text-xl font-medium placeholder:text-gray-500 focus:!outline-none"
+            />
+            <Input
+              id="description"
+              element="textarea"
+              validators={[VALIDATOR_MINLENGTH(5)]}
+              errorText="Please enter a valid description (min. 5 characters)."
+              onInput={inputHandler}
+              initialValue={loadedPlace.description}
+              initialValid={true}
+              className="w-full !border-0 !px-0 !py-1 text-base placeholder:text-gray-500 focus:!outline-none mb-3"
+            />
+
+            <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+              <Button
+                inverse
+                to={`/${auth.userId}/places/`}
+                className="rounded-lg border border-gray-300 !text-gray-800 font-semibold px-6 py-3 hover:!bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!formState.isValid}
+                className="rounded-lg border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 px-6"
+              >
+                Save
+              </Button>
+            </div>
+          </form>
+        </Card>
       )}
     </>
   );

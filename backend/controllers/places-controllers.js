@@ -31,35 +31,12 @@ const getPlaceById = async (req, res, next) => {
     ); // trigger error handling middleware
     return next(error);
   }
-  res.json({ place: place.toObject({ getters: true }) }); //=>{ place } => { place: place }
+  res.json({ place: place.toObject({ getters: true }) }); 
 };
 
 const getPlacesByUserId = async (req, res, next) => {
-  const userId = req.params.uid; 
+  const userId = req.params.uid;
 
-  // let places;
-  // try {
-  //   places = await Place.find({creator: userId});
-  // } catch (err) {
-  //   const error = new HttpError(
-  //     'Fetching places failed, please try again later',
-  //     500
-  //   );
-  //   return next(error);
-  // }
-
-  // if (!places || places.length === 0) {
-  //   const error = new HttpError(
-  //     "Could not find a place for the provided user id",
-  //     404
-  //   ); // trigger error handling middleware
-  //   return next(error)
-
-  // }
-
-  // res.json({ places: places.map( place => place.toObject({ getters: true})) }); //=>{ place } => { place: place }
-
-  // get alternatives
   let userWithPlaces;
   try {
     userWithPlaces = await User.findById(userId).populate("places");
@@ -74,13 +51,15 @@ const getPlacesByUserId = async (req, res, next) => {
   if (!userWithPlaces || userWithPlaces.places.length === 0) {
     return next(
       new HttpError("Could not find a place for the provided user id", 404),
-    ); // trigger Model error handling middleware
+    );
   }
 
   res.json({
-    places: userWithPlaces.places.map((place) =>
-      place.toObject({ getters: true }),
-    ),
+    places: userWithPlaces.places.map((place) => ({
+      ...place.toObject({ getters: true }),
+      creatorName: userWithPlaces.name,
+      creatorImage: userWithPlaces.image,
+    })),
   });
 };
 

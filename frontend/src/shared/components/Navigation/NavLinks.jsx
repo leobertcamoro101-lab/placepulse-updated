@@ -41,6 +41,7 @@ function NavLinks () {
           </NavLink>
         </li>
       )}
+
       {auth.isLoggedIn && (
         <li className="md:mx-1">
           <button
@@ -52,6 +53,20 @@ function NavLinks () {
           </button>
         </li>
       )}
+
+      {/* go directly to Auth */}
+      {/* {auth.isLoggedIn && (
+        <li className="md:mx-1">
+          <NavLink
+            to="/"
+            onClick={auth.logout}
+            aria-label="Logout"
+            className="flex flex-col items-center justify-center px-4 py-2 border-b-2 border-transparent text-gray-500 hover:bg-gray-100 cursor-pointer bg-transparent focus:outline-none transition-colors"
+          >
+            <LogOut size={24} />
+          </NavLink>
+        </li>
+      )} */}
     </ul>
   );
 };

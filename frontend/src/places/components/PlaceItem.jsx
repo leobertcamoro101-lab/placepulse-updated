@@ -1,141 +1,192 @@
-import { useState, useContext } from 'react';
-import Card from '../../shared/components/UIElements/Card';
-import Button from '../../shared/components/FormElements/Button';
-import Modal from '../../shared/components/UIElements/Modal';
-import Map from '../../shared/components/UIElements/Map';
-import ErrorModal from '../../shared/components/UIElements/ErrorModal';
-import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
-import { AuthContext } from '../../shared/context/auth-context';
-import { useHttpClient } from '../../shared/hooks/http-hook';
+import { useState, useContext, useRef, useEffect } from "react";
+import { MoreHorizontal, MapPin, Pencil, Trash2 } from "lucide-react";
+import Card from "../../shared/components/UIElements/Card";
+import Button from "../../shared/components/FormElements/Button";
+import InfoModal from '../../shared/components/UIElements/InfoModal';
+import ConfirmModal from "../../shared/components/UIElements/ConfirmModal";
+import Map from "../../shared/components/UIElements/Map";
+import Avatar from "../../shared/components/UIElements/Avatar";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
-const PlaceItem = ({ id, image, title, description, address, coordinates, onDelete, creatorId }) => {
-  const {isLoading, error, sendRequest, clearError} = useHttpClient();
+const PlaceItem = ({
+  id,
+  image,
+  title,
+  description,
+  address,
+  coordinates,
+  onDelete,
+  creatorId,
+  creatorName,
+  creatorImage,
+  createdAt,
+}) => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef();
 
-  const openMapHandler = () => setShowMap(true);
+  const openMapHandler = () => {
+    setShowMap(true);
+    setMenuOpen(false);
+  };
   const closeMapHandler = () => setShowMap(false);
-  const showDeleteWarningHandler = () => setShowConfirmModal(true);
+  const showDeleteWarningHandler = () => {
+    setShowConfirmModal(true);
+    setMenuOpen(false);
+  };
   const cancelDeleteHandler = () => setShowConfirmModal(false);
+
+  // Close the dropdown when clicking anywhere outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    try{
+    try {
       await sendRequest(
-        import.meta.env.VITE_BACKEND_URL + `/places/${id}`, 
-        'DELETE',
+        import.meta.env.VITE_BACKEND_URL + `/places/${id}`,
+        "DELETE",
         null,
-        {
-          Authorization: 'Bearer ' + auth.token
-        }
+        { Authorization: "Bearer " + auth.token },
       );
       onDelete(id);
-    }catch(err){
-      // the catch is empty because it's set when using useHttpClient inside http-hook.js file
-        console.log(err) // to get rid or curly marked (to know the error message in console)
+    } catch (err) {
+      console.log(err);
     }
-    
   };
+
+  const isOwner = auth.userId === creatorId;
+
   return (
     <>
-      {/* Map Modal */}
       <ErrorModal error={error} onClear={clearError} />
-      <Modal
+      {/* Map Modal */}
+
+      <InfoModal
         show={showMap}
         onCancel={closeMapHandler}
-        header={address}
-        contentClass="p-0"
-        footerClass="text-right"
-        footer={
-          <Button 
-            onClick={closeMapHandler}
-            className="rounded border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
-          >
-            CLOSE
-          </Button>}
+        icon={MapPin}
+        title={address}
+        
       >
         <div className="h-60 w-full">
           <Map center={coordinates} zoom={16} />
         </div>
-      </Modal>
+      </InfoModal>
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      <ConfirmModal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
-        header="Are you sure?"
-        footerClass="text-right"
-        footer={
-          <>
-            <Button
-              inverse
-              onClick={cancelDeleteHandler}
-              className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
-            >
-              CANCEL
-            </Button>
-            <Button
-              danger
-              onClick={confirmDeleteHandler}
-              className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
-            >
-              DELETE
-            </Button>
-          </>
-        }
-      >
-        <p>
-          Do you want to proceed and delete this place? Please note that it
-          can't be undone thereafter.
-        </p>
-      </Modal>
-      {/* Place Item Card */}
-      <li className="my-4 list-none">
-        <Card className="p-0">
+        onConfirm={confirmDeleteHandler}
+        title="Delete this place?"
+        message="Are you sure you want to delete this place? All of its data will be permanently removed. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      {/* Facebook-style Post Card */}
+      <li className="my-4 list-none w-full max-w-[40rem] mx-auto">
+        <Card className="p-0 overflow-visible">
           {isLoading && <LoadingSpinner asOverlay />}
-          <div className="h-50 w-full mr-6 md:h-80">
+
+          {/* Post header: avatar, name, date, three-dot menu */}
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10">
+                <div className="w-10 h-10">
+                  <Avatar
+                    image={creatorImage}
+                    alt={creatorName || "User"}
+                    width="40px"
+                  />
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 m-0">
+                  {creatorName || "Unknown user"}
+                </p>
+                {createdAt && (
+                  <p className="text-xs text-gray-500 m-0">
+                    {new Date(createdAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((open) => !open)}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
+                aria-label="Post options"
+              >
+                <MoreHorizontal size={20} />
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                  <button
+                    onClick={openMapHandler}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <MapPin size={16} /> View on Map
+                  </button>
+
+                  {isOwner && (
+                    <Button
+                      to={`/places/${id}`}
+                      className="!w-full !flex !items-center !gap-2 !px-4 !py-2 !text-sm !text-gray-700 hover:!bg-gray-100 !bg-transparent !border-0 !rounded-none !m-0 !justify-start"
+                    >
+                      <Pencil size={16} /> Edit
+                    </Button>
+                  )}
+
+                  {isOwner && (
+                    <button
+                      onClick={showDeleteWarningHandler}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} /> Delete
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Post body: title + description */}
+          <div className="px-4 pb-3">
+            <h2 className="text-lg font-semibold text-gray-900 m-0 mb-1">
+              {title}
+            </h2>
+            <p className="text-sm text-gray-600 m-0">{address}</p>
+            <p className="text-sm text-gray-800 mt-2 m-0">{description}</p>
+          </div>
+
+          {/* Post image */}
+          <div className="w-full h-64 md:h-96">
             <img
-              // src={`${import.meta.env.VITE_BACKEND_ASSET_URL}/${props.image}`} // removed switched to Cloudinary, VITE_BACKEND_ASSET_URL is no longer needed
               src={image}
               alt={title}
               className="h-full w-full object-cover"
             />
-          </div>
-
-          <div className="p-4 text-center">
-            <h2 className="m-0 mb-2">{title}</h2>
-            <h3 className="m-0 mb-2">{address}</h3>
-            <p className="m-0 mb-2">{description}</p>
-          </div>
-
-          <div className="p-4 text-center border-t border-[#ccc] [&>*]:m-2">
-            <Button
-              inverse
-              onClick={openMapHandler}
-              className="rounded border border-blue-600 text-blue-600 font-semibold px-6 py-3 hover:bg-blue-600 hover:text-white"
-            >
-              VIEW ON MAP
-            </Button>
-
-            {auth.userId === creatorId && (
-              <Button
-                to={`/places/${id}`}
-                className="rounded border-blue-600 bg-blue-600 hover:bg-blue-700 hover:border-blue-600 text-white font-semibold py-3 text-lg"
-              >
-                EDIT
-              </Button>
-            )}
-
-            {auth.userId === creatorId && (
-              <Button
-                danger
-                onClick={showDeleteWarningHandler}
-                className="rounded border-red-600 bg-red-600 hover:bg-red-700 hover:border-red-600 text-white font-semibold py-3 text-lg"
-              >
-                DELETE
-              </Button>
-            )}
           </div>
         </Card>
       </li>
@@ -144,84 +195,3 @@ const PlaceItem = ({ id, image, title, description, address, coordinates, onDele
 };
 
 export default PlaceItem;
-
-
-// import { useState, useContext } from 'react';
-// import Card from '../../shared/components/UIElements/Card';
-// import Button from '../../shared/components/FormElements/Button';
-// import Modal from '../../shared/components/UIElements/ModalOverlay';
-// import Map from '../../shared/components/UIElements/Map';
-// import { AuthContext } from '../../shared/context/auth-context';
-
-// function PlaceItem ({ id, image, title, description, address, coordinates }) {
-//   const auth = useContext(AuthContext);
-//   const [showMap, setShowMap] = useState(false);
-//   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-//   const openMapHandler = () => setShowMap(true);
-//   const closeMapHandler = () => setShowMap(false);
-
-//   const showDeleteWarningHandler = () => setShowConfirmModal(true);
-//   const cancelDeleteHandler = () => setShowConfirmModal(false);
-
-//   const confirmDeleteHandler = () => {
-//     setShowConfirmModal(false);
-//     console.log('DELETING...');
-//   };
-
-//   return (
-//     <>
-//           <Map center={coordinates} zoom={16} />
-
-//       <Modal
-//         show={showConfirmModal}
-//         onCancel={cancelDeleteHandler}
-//         header="Are you sure?"
-//         footerClass="text-right"
-//         footer={
-//           <>
-//             <Button inverse onClick={cancelDeleteHandler}>
-//               CANCEL
-//             </Button>
-//             <Button danger onClick={confirmDeleteHandler}>
-//               DELETE
-//             </Button>
-//           </>
-//         }
-//       >
-//         <p>
-//           Do you want to proceed and delete this place? Please note that it
-//           can't be undone thereafter.
-//         </p>
-//       </Modal>
-
-//       <li className="mt-4 mb-4">
-//         <Card className="p-0">
-//           <div className="w-full h-[12.5rem] mr-6">
-//             <img src={image} alt={title} />
-//           </div>
-//           <div className="p-4 text-center">
-//             <h2>{title}</h2>
-//             <h3>{address}</h3>
-//             <p>{description}</p>
-//           </div>
-//           <div className="p-4 text-center border-t border-gray-300">
-//             <Button inverse onClick={openMapHandler}>
-//               VIEW ON MAP
-//             </Button>
-//             {auth.isLoggedIn && (
-//               <Button to={`/places/${id}`}>EDIT</Button>
-//             )}
-//             {auth.isLoggedIn && (
-//               <Button danger onClick={showDeleteWarningHandler}>
-//                 DELETE
-//               </Button>
-//             )}
-//           </div>
-//         </Card>
-//       </li>
-//     </>
-//   );
-// };
-
-// export default PlaceItem;

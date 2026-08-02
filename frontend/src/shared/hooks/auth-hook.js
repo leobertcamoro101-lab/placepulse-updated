@@ -3,15 +3,17 @@ import { useState, useCallback, useEffect } from "react";
 let logoutTimer;
 
 export const useAuth = () => {
-  const [token, setToken] = useState(null); // or useState(false)
+  const [token, setToken] = useState(null);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
   const [userId, setUserId] = useState(false);
+  const [name, setName] = useState(null);
+  const [image, setImage] = useState(null);
 
-  const login = useCallback((uid, token, expirationDate) => {
-    // expirationDate either we have existing expiration date or don't have, we generate new one (new Date) // is an optional parameter that can be passed in to set the token expiration date
+  const login = useCallback((uid, token, expirationDate, name, image) => {
     setToken(token);
     setUserId(uid);
-    // tokenExpirationDate is same name as above useState(), but this will not override, it's only shadowed variable, you can choose any name you want, but it's better to use same name for clarity
+    setName(name);
+    setImage(image);
     const tokenExpirationDate =
       expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
     setTokenExpirationDate(tokenExpirationDate);
@@ -21,15 +23,19 @@ export const useAuth = () => {
         userId: uid,
         token: token,
         expiration: tokenExpirationDate.toISOString(),
+        name: name,
+        image: image,
       }),
-    ); // store the token and userId in localStorage when user logs in
+    );
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setTokenExpirationDate(null);
     setUserId(null);
-    localStorage.removeItem("userData"); //clear the token and userId from localStorage when user logs out
+    setName(null);
+    setImage(null);
+    localStorage.removeItem("userData");
   }, []);
 
   useEffect(() => {
@@ -49,22 +55,18 @@ export const useAuth = () => {
       storedData.token &&
       new Date(storedData.expiration) > new Date()
     ) {
-    //   login(
-    //     storedData.userId,
-    //     storedData.token,
-    //     new Date(storedData.expiration),
-    //   );
-
-      //to remove the red curly underline of login()
       const timer = setTimeout(() => {
-       login(
-         storedData.userId,
-         storedData.token,
-         new Date(storedData.expiration)
-       );
+        login(
+          storedData.userId,
+          storedData.token,
+          new Date(storedData.expiration),
+          storedData.name,
+          storedData.image
+        );
       }, 0);
       return () => clearTimeout(timer);
     }
   }, [login]);
-  return { token, login, logout, userId }
+
+  return { token, login, logout, userId, name, image };
 };

@@ -66,7 +66,7 @@ function Input ({
 
   const baseInputClasses = 'block w-full font-inherit p-[0.15rem_0.25rem] border outline-none transition-colors duration-200';
   const normalInputClasses = 'border-[#ccc] bg-[#f8f8f8] focus:bg-[#ebebeb] focus:border-[#510077]';
-  const invalidInputClasses = 'border-red-500 bg-[#ffd1d1]';
+  const invalidInputClasses = 'border-red-500 bg-[#ccccc]';
 
   const computedInputClasses = cn(
     baseInputClasses,
