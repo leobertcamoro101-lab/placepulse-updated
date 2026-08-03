@@ -15,6 +15,13 @@ function NavLinks () {
 
   return (
     <ul className="list-none m-0 p-0 w-full h-full flex flex-col justify-center items-center md:flex-row">
+      {/* {auth.isLoggedIn && (
+        <li className="md:mx-1">
+        <NavLink to="/users" className={linkClasses} aria-label="All Users">
+          <Users size={24} />
+        </NavLink>
+      </li>
+      )} */}
       <li className="md:mx-1">
         <NavLink to="/users" className={linkClasses} aria-label="All Users">
           <Users size={24} />

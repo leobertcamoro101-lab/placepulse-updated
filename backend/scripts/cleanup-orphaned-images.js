@@ -53,8 +53,8 @@ const run = async () => {
     for (const resource of result.resources) {
       if (!usedPublicIds.has(resource.public_id)) {
         console.log('Orphan found, deleting:', resource.public_id);
-        // await cloudinary.uploader.destroy(resource.public_id); // to delete
-        console.log('WOULD DELETE:', resource.public_id); // dry-run mode
+        await cloudinary.uploader.destroy(resource.public_id); // to delete
+        // console.log('WOULD DELETE:', resource.public_id); // dry-run mode
         orphanCount++;
       }
     }

@@ -13,38 +13,17 @@ router.post(
   upload.single("image"),
   uploadToCloudinary,
   [
-    check("name").not().isEmpty(),
-    check("email")
-      .normalizeEmail() // Test@test.com => test@test.com
-      .isEmail(),
+    check("firstName").not().isEmpty(),
+    check("lastName").not().isEmpty(),
+    check("birthday").not().isEmpty(),
+    check("gender").isIn(['female', 'male', 'custom']),
+    check("email").normalizeEmail().isEmail(),
     check("password").isLength({ min: 6 }),
   ],
   usersControllers.signup,
 );
 router.post("/login", usersControllers.login);
+router.post('/forgot-password', usersControllers.forgotPassword);
+router.post('/reset-password', usersControllers.resetPassword);
 
 module.exports = router;
-
-// const express = require("express");
-
-// const { check } = require("express-validator");
-
-// const usersControllers = require("../controllers/users-controllers");
-
-// const router = express.Router();
-
-// router.get("/", usersControllers.getUsers);
-// router.post(
-//   "/signup",
-//   [
-//     check("name").not().isEmpty(),
-//     check("email")
-//       .normalizeEmail() // Test@test.com => test@test.com
-//       .isEmail(),
-//     check("password").isLength({ min: 6 }),
-//   ],
-//   usersControllers.signup,
-// );
-// router.post("/login", usersControllers.login);
-
-// module.exports = router;

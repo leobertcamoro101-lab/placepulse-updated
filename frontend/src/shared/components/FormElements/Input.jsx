@@ -1,7 +1,7 @@
 import { useReducer, useEffect } from 'react';
 
 import { validate } from '../../utils/validators';
-import { cn } from '../../utils/cn'; // adjust path to match your folder structure
+import { cn } from '../../utils/cn';
 
 const inputReducer = (state, action) => {
   switch (action.type) {
@@ -34,7 +34,8 @@ function Input ({
   rows = 3,
   label,
   errorText,
-  className
+  className,
+  options // NEW — array of { value, label } for element="select"
 }) {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: initialValue,
@@ -74,8 +75,9 @@ function Input ({
     className
   );
 
-  const inputElement =
-    elementType === 'input' ? (
+  let inputElement;
+  if (elementType === 'input') {
+    inputElement = (
       <input
         id={id}
         type={type}
@@ -85,7 +87,24 @@ function Input ({
         value={value}
         className={computedInputClasses}
       />
-    ) : (
+    );
+  } else if (elementType === 'select') {
+    inputElement = (
+      <select
+        id={id}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={value}
+        className={computedInputClasses}
+      >
+        <option value="" disabled>{placeholder || 'Select...'}</option>
+        {options && options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    );
+  } else {
+    inputElement = (
       <textarea
         id={id}
         rows={rows}
@@ -95,6 +114,7 @@ function Input ({
         className={computedInputClasses}
       />
     );
+  }
 
   return (
     <div className="my-4">

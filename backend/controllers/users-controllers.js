@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const sendResetPasswordEmail = require('../util/send-email');
 
 const { deleteCloudinaryImage } = require('../util/cloudinary-cleanup');
 const HttpError = require("../models/http-error");
@@ -33,7 +35,7 @@ const signup = async (req, res, next) => {
     return next(new HttpError("No image provided, please upload one.", 422));
   }
 
-  const { name, email, password } = req.body;
+  const { firstName, lastName, birthday, gender, email, password } = req.body;
 
   let existingUser;
   try {
@@ -59,7 +61,7 @@ const signup = async (req, res, next) => {
   let hashedPassword;
   try {
     hashedPassword = await bcrypt.hash(password, 12);
-  }catch(err){
+  } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
     const error = new HttpError(
       'Could not create user, please try again',
@@ -67,9 +69,12 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
-  
+
   const createdUser = new User({
-    name,
+    firstName,
+    lastName,
+    birthday,
+    gender,
     email,
     image: req.file.cloudinaryUrl,
     password: hashedPassword,
@@ -86,25 +91,26 @@ const signup = async (req, res, next) => {
   }
 
   let token;
-  try{
+  try {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
       process.env.JWT_KEY,
       { expiresIn: '1h' }
     );
-  }catch(err){
+  } catch (err) {
     console.log(err);
     const error = new HttpError("Signing up failed, please try again.", 500);
     return next(error);
   };
-    res.status(201).json({
-      userId: createdUser.id,
-      email: createdUser.email,
-      name: createdUser.name,
-      image: createdUser.image,
-      token: token,
-    });
-    
+
+  res.status(201).json({
+    userId: createdUser.id,
+    email: createdUser.email,
+    name: createdUser.name,
+    image: createdUser.image,
+    token: token,
+    // name: createdUser.firstName + ' ' + createdUser.lastName,
+  });
 };
 
 const login = async (req, res, next) => {
@@ -170,6 +176,80 @@ const login = async (req, res, next) => {
   });
 };
 
+const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    return next(new HttpError('Something went wrong, please try again later.', 500));
+  }
+
+  // Always respond the same way, whether or not the email exists —
+  // this prevents leaking which emails are registered in your system
+  if (!existingUser) {
+    return res.json({ message: 'If that email exists, a reset link has been sent.' });
+  }
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+  existingUser.resetPasswordToken = hashedToken;
+  existingUser.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  try {
+    await existingUser.save();
+    await sendResetPasswordEmail(existingUser.email, rawToken);
+  } catch (err) {
+    console.log(err);
+    return next(new HttpError('Could not send reset email, please try again.', 500));
+  }
+
+  res.json({ message: 'If that email exists, a reset link has been sent.' });
+};
+
+const resetPassword = async (req, res, next) => {
+  const { token, password } = req.body;
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+  } catch (err) {
+    return next(new HttpError('Something went wrong, please try again later.', 500));
+  }
+
+  if (!existingUser) {
+    return next(new HttpError('Reset link is invalid or has expired.', 400));
+  }
+
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    return next(new HttpError('Could not reset password, please try again.', 500));
+  }
+
+  existingUser.password = hashedPassword;
+  existingUser.resetPasswordToken = undefined;
+  existingUser.resetPasswordExpires = undefined;
+
+  try {
+    await existingUser.save();
+  } catch (err) {
+    return next(new HttpError('Could not reset password, please try again.', 500));
+  }
+
+  res.json({ message: 'Password has been reset successfully.' });
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
+exports.forgotPassword = forgotPassword;
+exports.resetPassword = resetPassword;
