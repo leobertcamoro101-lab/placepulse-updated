@@ -68,5 +68,18 @@ export const useAuth = () => {
     }
   }, [login]);
 
-  return { token, login, logout, userId, name, image };
+  const updateUserInfo = useCallback((newName, newImage) => {
+  setName(newName);
+  setImage(newImage);
+
+  const storedData = JSON.parse(localStorage.getItem("userData"));
+  if (storedData) {
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({ ...storedData, name: newName, image: newImage })
+    );
+  }
+}, []);
+
+  return { token, login, logout, userId, name, image, updateUserInfo };
 };

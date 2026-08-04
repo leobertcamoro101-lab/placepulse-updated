@@ -6,7 +6,7 @@ import { useAuth } from './shared/hooks/auth-hook';
 import router from './router';
 
 const App = () => {
-  const { token, login, logout, userId, name, image } = useAuth();
+  const { token, login, logout, userId, name, image, updateUserInfo } = useAuth();
 
   return (
     <LoadingProvider>
@@ -19,6 +19,7 @@ const App = () => {
           image: image,
           login: login,
           logout: logout,
+          updateUserInfo: updateUserInfo,
         }}
       >
         <RouterProvider router={router} />

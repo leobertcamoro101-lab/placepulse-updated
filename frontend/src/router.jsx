@@ -4,7 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from './shared/components/Navigation/RootLayout';
 import RequireAuth from './shared/components/Navigation/RequireAuth';
 import HomeRoute from './user/pages/HomeRoute';
-import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword } from './routes-config';
+import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword } from './routes-config';
 
 
 // const Users = lazy(() => import('./user/pages/Users'));
@@ -13,26 +13,47 @@ import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword
 // const UpdatePlace = lazy(() => import('./places/pages/UpdatePlace'));
 // const ForgotPassword = lazy(() => import('./user/pages/ForgotPassword'));
 // const ResetPassword = lazy(() => import('./user/pages/ResetPassword'));
+// const Profile = lazy(() => import('./user/pages/Profile'));
+// const EditProfile = lazy(() => import('./user/pages/EditProfile'));
+// const ChangePassword = lazy(() => import('./user/pages/ChangePassword'));
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <RootLayout />,
     children: [
       { index: true, element: <HomeRoute /> },
-      { path: 'users', element: <Users /> },
-      { path: ':userId/places', element: <UserPlaces /> },
+      { path: "users", element: <Users /> },
+      { path: ":userId/places", element: <UserPlaces /> },
       {
-        path: 'places/new',
-        element: <RequireAuth><NewPlace /></RequireAuth>
+        path: "places/new",
+        element: (
+          <RequireAuth>
+            <NewPlace />
+          </RequireAuth>
+        ),
       },
       {
-        path: 'places/:placeId',
-        element: <RequireAuth><UpdatePlace /></RequireAuth>
+        path: "places/:placeId",
+        element: (
+          <RequireAuth>
+            <UpdatePlace />
+          </RequireAuth>
+        ),
       },
-      { path: '*', element: <Navigate to="/" replace /> },
-      { path: 'forgot-password', element: <ForgotPassword /> },
-      { path: 'reset-password/:token', element: <ResetPassword /> },
+      { path: "*", element: <Navigate to="/" replace /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password/:token", element: <ResetPassword /> },
+      {
+        path: "profile",
+        element: (
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>
+        ),
+      },
+      { path: 'profile/edit', element: <RequireAuth><EditProfile /></RequireAuth> },
+      { path: 'profile/password', element: <RequireAuth><ChangePassword /></RequireAuth> },
     ],
   },
 ]);

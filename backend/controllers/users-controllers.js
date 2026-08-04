@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const sendResetPasswordEmail = require('../util/send-email');
 
-const { deleteCloudinaryImage } = require('../util/cloudinary-cleanup');
+const { deleteCloudinaryImage, extractPublicId} = require('../util/cloudinary-cleanup');
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
@@ -20,6 +20,23 @@ const getUsers = async (req, res, next) => {
     return next(error);
   }
   res.json({ users: users.map((user) => user.toObject({ getters: true })) });
+};
+
+const getUserById = async (req, res, next) => {
+  const userId = req.params.uid;
+
+  let user;
+  try {
+    user = await User.findById(userId, '-password');
+  } catch (err) {
+    return next(new HttpError('Fetching user failed, please try again later', 500));
+  }
+
+  if (!user) {
+    return next(new HttpError('Could not find user for the provided id.', 404));
+  }
+
+  res.json({ user: user.toObject({ getters: true }) });
 };
 
 const signup = async (req, res, next) => {
@@ -248,8 +265,128 @@ const resetPassword = async (req, res, next) => {
   res.json({ message: 'Password has been reset successfully.' });
 };
 
+const updateProfile = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    return next(new HttpError('Invalid inputs passed, please check your data.', 422));
+  }
+
+  const userId = req.params.uid;
+
+  if (req.userData.userId !== userId) {
+    await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    return next(new HttpError('You are not allowed to edit this profile.', 403));
+  }
+
+  const { firstName, lastName, birthday, gender, email } = req.body;
+
+  let user;
+  try {
+    user = await User.findById(userId);
+  } catch (err) {
+    await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    return next(new HttpError('Something went wrong, could not update profile.', 500));
+  }
+
+  if (!user) {
+    await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    return next(new HttpError('Could not find user.', 404));
+  }
+
+  if (email && email !== user.email) {
+    let existingEmailUser;
+    try {
+      existingEmailUser = await User.findOne({ email });
+    } catch (err) {
+      await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+      return next(new HttpError('Something went wrong, could not update profile.', 500));
+    }
+    if (existingEmailUser) {
+      await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+      return next(new HttpError('That email is already in use.', 422));
+    }
+  }
+
+  const oldImagePublicId = req.file ? extractPublicId(user.image) : null;
+
+  user.firstName = firstName;
+  user.lastName = lastName;
+  user.birthday = birthday;
+  user.gender = gender;
+  user.email = email;
+  if (req.file && req.file.cloudinaryUrl) {
+    user.image = req.file.cloudinaryUrl;
+  }
+
+  try {
+    await user.save();
+  } catch (err) {
+    await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    return next(new HttpError('Updating profile failed, please try again.', 500));
+  }
+
+  if (oldImagePublicId) {
+    await deleteCloudinaryImage(oldImagePublicId);
+  }
+
+  res.json({ user: user.toObject({ getters: true }) });
+};
+
+const changePassword = async (req, res, next) => {
+  const userId = req.params.uid;
+
+  if (req.userData.userId !== userId) {
+    return next(new HttpError('You are not allowed to edit this profile.', 403));
+  }
+
+  const { currentPassword, newPassword } = req.body;
+
+  let user;
+  try {
+    user = await User.findById(userId);
+  } catch (err) {
+    return next(new HttpError('Something went wrong, please try again.', 500));
+  }
+
+  if (!user) {
+    return next(new HttpError('Could not find user.', 404));
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(currentPassword, user.password);
+  } catch (err) {
+    return next(new HttpError('Could not verify password, please try again.', 500));
+  }
+
+  if (!isValidPassword) {
+    return next(new HttpError('Current password is incorrect.', 401));
+  }
+
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(newPassword, 12);
+  } catch (err) {
+    return next(new HttpError('Could not update password, please try again.', 500));
+  }
+
+  user.password = hashedPassword;
+
+  try {
+    await user.save();
+  } catch (err) {
+    return next(new HttpError('Could not update password, please try again.', 500));
+  }
+
+  res.json({ message: 'Password updated successfully.' });
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
+exports.getUserById = getUserById;
+exports.updateProfile = updateProfile;
+exports.changePassword = changePassword;

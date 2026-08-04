@@ -1,8 +1,9 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { MoreHorizontal, MapPin, Pencil, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
-import InfoModal from '../../shared/components/UIElements/InfoModal';
+import InfoModal from "../../shared/components/UIElements/InfoModal";
 import ConfirmModal from "../../shared/components/UIElements/ConfirmModal";
 import Map from "../../shared/components/UIElements/Map";
 import Avatar from "../../shared/components/UIElements/Avatar";
@@ -80,7 +81,6 @@ const PlaceItem = ({
         onCancel={closeMapHandler}
         icon={MapPin}
         title={address}
-        
       >
         <div className="h-60 w-full">
           <Map center={coordinates} zoom={16} />
@@ -106,7 +106,17 @@ const PlaceItem = ({
           {/* Post header: avatar, name, date, three-dot menu */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10">
+              {isOwner ? (
+                <Link to="/profile">
+                  <div className="w-10 h-10">
+                    <Avatar
+                      image={creatorImage}
+                      alt={creatorName || "User"}
+                      width="40px"
+                    />
+                  </div>
+                </Link>
+              ) : (
                 <div className="w-10 h-10">
                   <Avatar
                     image={creatorImage}
@@ -114,21 +124,47 @@ const PlaceItem = ({
                     width="40px"
                   />
                 </div>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 m-0">
-                  {creatorName || "Unknown user"}
-                </p>
-                {createdAt && (
-                  <p className="text-xs text-gray-500 m-0">
-                    {new Date(createdAt).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+              )}
+              {isOwner ? (
+                <Link to="/profile" className="no-underline hover:underline">
+                  <p className="font-semibold text-gray-900 m-0">
+                    {creatorName || "Unknown user"}
                   </p>
-                )}
-              </div>
+                  {createdAt && (
+                    <p className="text-xs text-gray-500 m-0">
+                      {new Date(createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  )}
+                </Link>
+              ) : (
+                <div>
+                  <p className="font-semibold text-gray-900 m-0">
+                    {creatorName || "Unknown user"}
+                  </p>
+                  {createdAt && (
+                    <p className="text-xs text-gray-500 m-0">
+                      {new Date(createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+              )}
+              {/* {createdAt && (
+                <p className="text-xs text-gray-500 m-0">
+                  {new Date(createdAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )} */}
             </div>
 
             <div className="relative" ref={menuRef}>
