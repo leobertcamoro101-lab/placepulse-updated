@@ -26,8 +26,8 @@ const run = async () => {
   // ✅ Add these debug logs
   console.log('Places found:', places.length);
   console.log('Users found:', users.length);
-  console.log('Place images:', places.map(p => p.image));
-  console.log('User images:', users.map(u => u.image));
+  console.log('Place images:', places.map(p => p.image)); // removed if there are to many images
+  console.log('User images:', users.map(u => u.image)); // removed if there are to many images
 
   const usedPublicIds = new Set(
     [...places, ...users]
@@ -35,7 +35,7 @@ const run = async () => {
       .filter(Boolean)
   );
   // ✅ Debug — print what IDs were found
-  console.log('Used public IDs:', [...usedPublicIds]);
+  console.log('Used public IDs:', [...usedPublicIds]); // removed if there are to many images
 
   console.log(`Found ${usedPublicIds.size} images referenced in the database.`);
 
@@ -53,8 +53,8 @@ const run = async () => {
     for (const resource of result.resources) {
       if (!usedPublicIds.has(resource.public_id)) {
         console.log('Orphan found, deleting:', resource.public_id);
-        await cloudinary.uploader.destroy(resource.public_id); // to delete
-        // console.log('WOULD DELETE:', resource.public_id); // dry-run mode
+        // await cloudinary.uploader.destroy(resource.public_id); // to delete
+        console.log('WOULD DELETE:', resource.public_id); // dry-run mode
         orphanCount++;
       }
     }

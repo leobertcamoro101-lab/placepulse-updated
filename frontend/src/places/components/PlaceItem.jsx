@@ -126,20 +126,37 @@ const PlaceItem = ({
                 </div>
               )}
               {isOwner ? (
-                <Link to="/profile" className="no-underline hover:underline">
-                  <p className="font-semibold text-gray-900 m-0">
-                    {creatorName || "Unknown user"}
-                  </p>
-                  {createdAt && (
-                    <p className="text-xs text-gray-500 m-0">
-                      {new Date(createdAt).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                // <Link to="/profile" className="no-underline hover:underline">
+                //   <p className="font-semibold text-gray-900 m-0">
+                //     {creatorName || "Unknown user"}
+                //   </p>
+                //   {createdAt && (
+                //     <p className="text-xs text-gray-500 m-0">
+                //       {new Date(createdAt).toLocaleDateString(undefined, {
+                //         year: "numeric",
+                //         month: "long",
+                //         day: "numeric",
+                //       })}
+                //     </p>
+                //   )}
+                // </Link>
+
+                <div>
+                  <Link to="/profile" className="no-underline hover:underline">
+                    <p className="font-semibold text-gray-900 m-0">
+                      {creatorName || "Unknown user"}
                     </p>
-                  )}
-                </Link>
+                  </Link>
+                  {createdAt && (
+                      <p className="text-xs text-gray-500 m-0">
+                        {new Date(createdAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    )}
+                </div>
               ) : (
                 <div>
                   <p className="font-semibold text-gray-900 m-0">
@@ -156,15 +173,6 @@ const PlaceItem = ({
                   )}
                 </div>
               )}
-              {/* {createdAt && (
-                <p className="text-xs text-gray-500 m-0">
-                  {new Date(createdAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              )} */}
             </div>
 
             <div className="relative" ref={menuRef}>
