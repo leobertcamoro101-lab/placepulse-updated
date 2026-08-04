@@ -144,6 +144,8 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  console.log('Login attempt — email received:', JSON.stringify(email), 'user found:', !!existingUser); // TEMP DEBUG
+
   if (!existingUser) {                              
     const error = new HttpError(
       "Invalid credentials, could not log you in",
