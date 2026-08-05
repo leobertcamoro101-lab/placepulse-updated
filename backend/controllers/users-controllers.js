@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const sendResetPasswordEmail = require('../util/send-email');
+const sendResetPasswordEmail = require('../util/email');
 
 const { deleteCloudinaryImage, extractPublicId} = require('../util/cloudinary-cleanup');
 const HttpError = require("../models/http-error");
