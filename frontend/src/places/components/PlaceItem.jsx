@@ -126,6 +126,8 @@ const PlaceItem = ({
                 </div>
               )}
               {isOwner ? (
+
+                // commented out the Link wrapping the name and date to avoid nested links, replaced with a div containing the Link for the name and a separate paragraph for the date
                 // <Link to="/profile" className="no-underline hover:underline">
                 //   <p className="font-semibold text-gray-900 m-0">
                 //     {creatorName || "Unknown user"}
