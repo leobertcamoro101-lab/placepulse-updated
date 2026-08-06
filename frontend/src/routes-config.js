@@ -9,3 +9,4 @@ export const ResetPassword = lazy(() => import('./user/pages/ResetPassword'));
 export const Profile = lazy(() => import('./user/pages/Profile'));
 export const EditProfile = lazy(() => import('./user/pages/EditProfile'));
 export const ChangePassword = lazy(() => import('./user/pages/ChangePassword'));
+export const Places = lazy(() => import('./places/pages/Places'));

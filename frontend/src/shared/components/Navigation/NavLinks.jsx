@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, MapPin, PlusCircle, LogOut, LogIn, User } from 'lucide-react';
+import { Users, MapPin, PlusCircle, LogOut, LogIn, User, LandPlot } from 'lucide-react';
 import { AuthContext } from '../../context/auth-context';
 
 function NavLinks () {
@@ -22,11 +22,20 @@ function NavLinks () {
         </NavLink>
       </li>
       )} */}
+      
       <li className="md:mx-1">
         <NavLink to="/users" className={linkClasses} aria-label="All Users">
           <Users size={24} />
         </NavLink>
       </li>
+      {auth.isLoggedIn && (
+        <li className="md:mx-1">
+          <NavLink to="/places" className={linkClasses} aria-label="All Places">
+            <LandPlot size={24} />
+          </NavLink>
+        </li>
+      )}
+      
       {auth.isLoggedIn && (
         <li className="md:mx-1">
           <NavLink to={`/${auth.userId}/places`} className={linkClasses} aria-label="My Places">

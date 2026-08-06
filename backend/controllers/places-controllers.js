@@ -235,8 +235,25 @@ const deletePlace = async (req, res, next) => {
   res.status(200).json({ message: "Deleted place" });
 };
 
+const getAllPlaces = async (req, res, next) => {
+  let places;
+  try {
+    // Fetch all places and optionally pull in user details like name
+    places = await Place.find({}).populate('creator', 'firstName lastName image').sort({ createdAt: -1 }); // populate the creator field with user details
+  } catch (err) {
+    return res.status(500).json({ message: 'Fetching places failed, please try again later.' });
+  }
+
+  if (!places || places.length === 0) {
+    return res.status(404).json({ message: 'No places found.' });
+  }
+
+  res.json({ places: places.map(place => place.toObject({ getters: true })) });
+};
+
 exports.getPlaceById = getPlaceById;
 exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
+exports.getAllPlaces = getAllPlaces;

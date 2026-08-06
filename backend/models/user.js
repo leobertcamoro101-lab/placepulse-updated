@@ -14,7 +14,14 @@ const userSchema = new Schema({
   resetPasswordExpires: { type: Date },
 
   places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
-}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+}, 
+{ 
+  timestamps: true,
+  toJSON: { virtuals: true }, 
+  toObject: { virtuals: true } 
+},
+
+);
 
 // Computed full name — keeps every existing `.name` usage across the app working unchanged
 userSchema.virtual('name').get(function () {

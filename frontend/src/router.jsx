@@ -4,7 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from './shared/components/Navigation/RootLayout';
 import RequireAuth from './shared/components/Navigation/RequireAuth';
 import HomeRoute from './user/pages/HomeRoute';
-import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword } from './routes-config';
+import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword, Places } from './routes-config';
 
 
 // const Users = lazy(() => import('./user/pages/Users'));
@@ -16,6 +16,7 @@ import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword
 // const Profile = lazy(() => import('./user/pages/Profile'));
 // const EditProfile = lazy(() => import('./user/pages/EditProfile'));
 // const ChangePassword = lazy(() => import('./user/pages/ChangePassword'));
+// const Places = lazy(() => import('./places/pages/Places'));
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
       },
       { path: 'profile/edit', element: <RequireAuth><EditProfile /></RequireAuth> },
       { path: 'profile/password', element: <RequireAuth><ChangePassword /></RequireAuth> },
+      { path: "places", element: <Places /> },
     ],
   },
 ]);

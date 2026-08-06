@@ -11,7 +11,7 @@ const User = require("../models/user");
 const getUsers = async (req, res, next) => {
   let users;
   try {
-    users = await User.find({}, "-password"); // exclude the password
+    users = await User.find({}, "-password").sort({ createdAt: -1 }); // exclude the password
   } catch (err) {
     const error = new HttpError(
       "Fetching users failed, please try again later",

@@ -26,11 +26,14 @@ function PlaceList ({ items, onDeletePlace }) {
           title={title}
           description={description}
           address={address}
-          creatorId={creator}
+          // creatorId={creator}
+          creatorId={creator?._id || creator}
           coordinates={location}
           onDelete={onDeletePlace}
-          creatorName={creatorName}
-          creatorImage={creatorImage}
+          // creatorName={creatorName}
+          // creatorImage={creatorImage}
+          creatorName={creator?.name || creatorName}
+          creatorImage={creator?.image || creatorImage}
           createdAt={createdAt}
         />
       ))}

@@ -14,13 +14,14 @@ function UsersList ({ items }) {
 
   return (
     <ul className="list-none mx-auto p-0 w-[90%] max-w-[50rem] flex flex-col items-center gap-4 m-4">
-      {items.map(({ id, image, name, places }) => (
+      {items.map(({ id, image, name, places, createdAt }) => (
         <UserItem
           key={id}
           id={id}
           image={image}
           name={name}
           placeCount={places.length}
+          createdAt={createdAt}
         />
       ))}
     </ul>
