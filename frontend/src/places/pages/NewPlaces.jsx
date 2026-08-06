@@ -46,7 +46,7 @@ function NewPlace () {
         { Authorization: 'Bearer ' + auth.token }
       );
 
-      navigate('/');
+      navigate(`/${auth.userId}/places`);
     } catch (err) {
       console.log(err);
     }

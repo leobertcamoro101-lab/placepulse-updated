@@ -39,7 +39,11 @@ const getPlacesByUserId = async (req, res, next) => {
 
   let userWithPlaces;
   try {
-    userWithPlaces = await User.findById(userId).populate("places");
+    // userWithPlaces = await User.findById(userId).populate("places"); // no sorting order old created place render at the top of the list, new created place render at the bottom of the list
+    userWithPlaces = await User.findById(userId).populate({
+      path: "places",
+      options: { sort: { createdAt: -1 } },
+    });
   } catch (err) {
     const error = new HttpError(
       "Fetching places failed, please try again later",

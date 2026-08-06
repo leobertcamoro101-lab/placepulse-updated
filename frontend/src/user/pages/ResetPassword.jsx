@@ -29,7 +29,7 @@ function ResetPassword() {
         { 'Content-Type': 'application/json' }
       );
       setSuccess(true);
-      setTimeout(() => navigate('/'), 2000);
+      setTimeout(() => navigate('/profile'), 2000);
     } catch (err) {
       console.log(err);
     }

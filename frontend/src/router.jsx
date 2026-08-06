@@ -3,14 +3,16 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import RootLayout from './shared/components/Navigation/RootLayout';
 import RequireAuth from './shared/components/Navigation/RequireAuth';
-import HomeRoute from './user/pages/HomeRoute';
-import { Users, NewPlace, UserPlaces, UpdatePlace, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword, Places } from './routes-config';
+import RedirectIfAuthenticated from './shared/components/Navigation/RedirectIfAuthenticated';
+// import HomeRoute from './user/pages/HomeRoute';
+import { Users, NewPlace, UserPlaces, UpdatePlace, Auth, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword, Places } from './routes-config';
 
 
 // const Users = lazy(() => import('./user/pages/Users'));
 // const NewPlace = lazy(() => import('./places/pages/NewPlaces'));
 // const UserPlaces = lazy(() => import('./places/pages/UserPlaces'));
 // const UpdatePlace = lazy(() => import('./places/pages/UpdatePlace'));
+// const Auth = lazy(() => import('./user/pages/Auth'));
 // const ForgotPassword = lazy(() => import('./user/pages/ForgotPassword'));
 // const ResetPassword = lazy(() => import('./user/pages/ResetPassword'));
 // const Profile = lazy(() => import('./user/pages/Profile'));
@@ -23,7 +25,14 @@ const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
-      { index: true, element: <HomeRoute /> },
+      {
+        index: true,
+        element: (
+          <RedirectIfAuthenticated>
+            <Auth />
+          </RedirectIfAuthenticated>
+        ),
+      },
       { path: "users", element: <Users /> },
       { path: ":userId/places", element: <UserPlaces /> },
       {
@@ -53,8 +62,22 @@ const router = createBrowserRouter([
           </RequireAuth>
         ),
       },
-      { path: 'profile/edit', element: <RequireAuth><EditProfile /></RequireAuth> },
-      { path: 'profile/password', element: <RequireAuth><ChangePassword /></RequireAuth> },
+      {
+        path: "profile/edit",
+        element: (
+          <RequireAuth>
+            <EditProfile />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "profile/password",
+        element: (
+          <RequireAuth>
+            <ChangePassword />
+          </RequireAuth>
+        ),
+      },
       { path: "places", element: <Places /> },
     ],
   },
@@ -62,4 +85,4 @@ const router = createBrowserRouter([
 
 export default router;
 
-// notes change HomeRoute to Auth (or not) if you change the Navlinks.jsx to go directly to Auth instead of HomeRoute.
+// notes change HomeRoute to Auth (or not) if you change the AccountMenu.jsx to go directly to Auth instead of HomeRoute.

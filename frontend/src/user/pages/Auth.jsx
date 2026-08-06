@@ -84,7 +84,7 @@ function Auth() {
           responseData.name,
           responseData.image,
         );
-        navigate("/users");
+        navigate("/places");
       } catch (err) {
         console.log(err);
       }
@@ -111,7 +111,7 @@ function Auth() {
           responseData.name,
           responseData.image,
         );
-        navigate("/users");
+        navigate("/places");
       } catch (err) {
         console.log(err);
       }

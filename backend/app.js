@@ -45,6 +45,16 @@ app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
   }
+
+  // Handle Multer-specific errors (file size, file type, etc.)
+  if (error.name === 'MulterError') {
+    let message = 'File upload error.';
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      message = 'Image is too large. Please upload a smaller file.';
+    }
+    return res.status(422).json({ message });
+  }
+
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred" });
 });

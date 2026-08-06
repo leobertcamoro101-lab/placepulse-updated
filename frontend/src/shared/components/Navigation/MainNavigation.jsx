@@ -4,19 +4,15 @@ import LogoImg from '../../../assets/Placepulse-logo.png'
 
 import MainHeader from './MainHeader';
 import NavLinks from './NavLinks';
+import AccountMenu from './AccountMenu';
 import SideDrawer from './SideDrawer';
 import Backdrop from '../UIElements/Backdrop';
 
 function MainNavigation () {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
-  const openDrawerHandler = () => {
-    setDrawerIsOpen(true);
-  };
-
-  const closeDrawerHandler = () => {
-    setDrawerIsOpen(false);
-  };
+  const openDrawerHandler = () => setDrawerIsOpen(true);
+  const closeDrawerHandler = () => setDrawerIsOpen(false);
 
   return (
     <React.Fragment>
@@ -27,7 +23,7 @@ function MainNavigation () {
         </nav>
       </SideDrawer>
 
-      <MainHeader >
+      <MainHeader>
         <button
           className="w-12 h-12 bg-transparent border-none flex flex-col justify-around mr-8 cursor-pointer md:hidden"
           onClick={openDrawerHandler}
@@ -37,13 +33,17 @@ function MainNavigation () {
           <span className="block w-12 h-[2.5px] bg-[#606366] rounded" />
         </button>
         <h1 className="text-white">
-          <Link to="/" className="no-underline">
+          <Link to="/places" className="no-underline">
             <img src={LogoImg} alt="PlacePulse" className="h-10" />
           </Link>
         </h1>
         <nav className="hidden md:flex md:absolute md:left-1/2 md:-translate-x-1/2">
           <NavLinks />
         </nav>
+
+        <div className="hidden md:flex ml-auto">
+          <AccountMenu />
+        </div>
       </MainHeader>
     </React.Fragment>
   );
