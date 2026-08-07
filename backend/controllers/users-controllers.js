@@ -11,7 +11,7 @@ const User = require("../models/user");
 const getUsers = async (req, res, next) => {
   let users;
   try {
-    users = await User.find({}, "-password").sort({ createdAt: -1 }); // exclude the password
+    users = await User.find({}, "-password -resetPasswordToken -resetPasswordExpires").sort({ createdAt: -1 }); // exclude the password
   } catch (err) {
     const error = new HttpError(
       "Fetching users failed, please try again later",
@@ -27,7 +27,7 @@ const getUserById = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findById(userId, '-password');
+    user = await User.findById(userId, '-password -resetPasswordToken -resetPasswordExpires');
   } catch (err) {
     return next(new HttpError('Fetching user failed, please try again later', 500));
   }
@@ -275,6 +275,7 @@ const updateProfile = async (req, res, next) => {
 
   const userId = req.params.uid;
 
+  // security check: ensure the user making the request is the same as the user being updated
   if (req.userData.userId !== userId) {
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
     return next(new HttpError('You are not allowed to edit this profile.', 403));
@@ -337,6 +338,7 @@ const updateProfile = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   const userId = req.params.uid;
 
+  // security check: ensure the user making the request is the same as the user being updated
   if (req.userData.userId !== userId) {
     return next(new HttpError('You are not allowed to edit this profile.', 403));
   }

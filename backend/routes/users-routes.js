@@ -10,9 +10,22 @@ const router = express.Router();
 
 router.get("/", usersControllers.getUsers);
 router.get("/:uid", usersControllers.getUserById);
+const rateLimit = require('express-rate-limit');
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: 'Too many attempts, please try again later.' },
+});
+
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { message: 'Too many password reset requests, please try again later.' },
+});
 router.post(
   "/signup",
+  authLimiter,
   upload.single("image"),
   uploadToCloudinary,
   [
@@ -26,9 +39,9 @@ router.post(
   ],
   usersControllers.signup,
 );
-router.post("/login", usersControllers.login);
-router.post('/forgot-password', usersControllers.forgotPassword);
-router.post('/reset-password', usersControllers.resetPassword);
+router.post("/login", authLimiter, usersControllers.login);
+router.post('/forgot-password', forgotPasswordLimiter, usersControllers.forgotPassword);
+router.post('/reset-password', authLimiter, usersControllers.resetPassword);
 
 // Everything below this line requires a valid token
 router.use(checkAuth);

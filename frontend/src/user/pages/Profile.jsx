@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import Card from '../../shared/components/UIElements/Card';
 import Avatar from '../../shared/components/UIElements/Avatar';
 import Button from '../../shared/components/FormElements/Button';
+import UserPlaces from '../../places/pages/UserPlaces';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import { useHttpClient } from '../../shared/hooks/http-hook';
@@ -83,19 +84,21 @@ function Profile() {
           </Card>
         </div>
       )}
+      {!isLoading && loadedUser && (<UserPlaces userId={auth.userId} />)}
     </>
   );
 }
 
 export default Profile;
 
+
+// do not render UserPlaces component inside the Profile page
 // import { useEffect, useState, useContext } from 'react';
 // import Card from '../../shared/components/UIElements/Card';
 // import Avatar from '../../shared/components/UIElements/Avatar';
 // import Button from '../../shared/components/FormElements/Button';
 // import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 // import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
-// import PlaceList from '../../places/components/PlaceList';
 // import { useHttpClient } from '../../shared/hooks/http-hook';
 // import { AuthContext } from '../../shared/context/auth-context';
 
@@ -103,7 +106,6 @@ export default Profile;
 //   const auth = useContext(AuthContext);
 //   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 //   const [loadedUser, setLoadedUser] = useState();
-//   const [loadedPlaces, setLoadedPlaces]= useState();
 
 //   useEffect(() => {
 //     const fetchUser = async () => {
@@ -121,23 +123,6 @@ export default Profile;
 //     fetchUser();
 //   }, [sendRequest, auth.userId]);
 
-//   useEffect(()=>{
-//     const fetchPlaces = async () =>{
-//       try {
-//         const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/places/user/${auth.userId}`);
-//         if(responseData){
-//           // i put this inside the if because of component http-hook.js abort-handling
-//           // Fix — guard against responseData being undefined before using it:
-//           setLoadedPlaces(responseData.places); //why places because of the backend "res.json({places: userWithPlaces.places.map((place) =>place.toObject({ getters: true }),),});"
-//         }
-//       } catch (err) {
-//         // the catch is empty because it's set when using useHttpClient inside http-hook.js file
-//         console.log(err) // to get rid or curly marked (to know the error message in console)
-//       }
-//     }
-//     fetchPlaces();
-//   }, [sendRequest, auth.userId]);
-
 //   if (isLoading && !loadedUser) {
 //     return (
 //       <div className="flex justify-center items-center my-8">
@@ -145,12 +130,6 @@ export default Profile;
 //       </div>
 //     );
 //   }
-
-//   const placeDeletedHandler = (deletedPlaceId) => {
-//     setLoadedPlaces((prevPlaces) =>
-//       prevPlaces.filter((place) => place.id !== deletedPlaceId),
-//     );
-//   };
 
 //   return (
 //     <>
@@ -199,7 +178,6 @@ export default Profile;
 //           </Card>
 //         </div>
 //       )}
-//       {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} onDeletePlace={placeDeletedHandler}/>}
 //     </>
 //   );
 // }
