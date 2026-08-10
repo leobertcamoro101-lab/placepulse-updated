@@ -1,17 +1,17 @@
-const SibApiV3Sdk = require('sib-api-v3-sdk');
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
-defaultClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+defaultClient.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-const sendResetPasswordEmail = async (toEmail, resetToken) => {
+const sendResetPasswordEmail = async (toEmail: string, resetToken: string): Promise<void> => {
   const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   await apiInstance.sendTransacEmail({
-    sender: { email: process.env.GMAIL_USER, name: 'PlacePulse' },
+    sender: { email: process.env.GMAIL_USER, name: "PlacePulse" },
     to: [{ email: toEmail }],
-    subject: 'Reset your PlacePulse password',
+    subject: "Reset your PlacePulse password",
     htmlContent: `
       <p>You requested a password reset for your PlacePulse account.</p>
       <p><a href="${resetLink}">Click here to reset your password</a></p>
@@ -20,4 +20,4 @@ const sendResetPasswordEmail = async (toEmail, resetToken) => {
   });
 };
 
-module.exports = sendResetPasswordEmail;
+export default sendResetPasswordEmail;

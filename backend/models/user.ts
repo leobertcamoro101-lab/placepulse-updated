@@ -1,8 +1,23 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-const Schema = mongoose.Schema;
+export interface IUser extends Document {
+  firstName: string;
+  lastName: string;
+  birthday: Date;
+  gender: "female" | "male" | "custom";
+  email: string;
+  password: string;
+  image: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+  places: mongoose.Types.ObjectId[];
+  name: string; // virtual
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>(
+  {
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   birthday: { type: Date, required: true },
@@ -13,7 +28,7 @@ const userSchema = new Schema({
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
 
-  places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
+  places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }], // with relation to place
 }, 
 { 
   timestamps: true,
@@ -28,4 +43,6 @@ userSchema.virtual('name').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-module.exports = mongoose.model("User", userSchema);
+const User: Model<IUser> = mongoose.model("User", userSchema);
+
+export default User;
