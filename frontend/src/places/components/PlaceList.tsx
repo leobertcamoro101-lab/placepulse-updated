@@ -1,28 +1,29 @@
 import Card from '../../shared/components/UIElements/Card';
 import PlaceItem from './PlaceItem';
 import Button from '../../shared/components/FormElements/Button';
+import { Place } from '../../shared/types/place';
 
-interface Creator {
-  _id?: string;
-  name?: string;
-  image?: string;
-}
+// interface Creator {
+//   _id?: string;
+//   name?: string;
+//   image?: string;
+// }
 
-interface Place {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
-  address: string;
-  creator?: Creator | string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-  creatorName?: string;
-  creatorImage?: string;
-  createdAt?: string;
-}
+// interface Place {
+//   id: string;
+//   image: string;
+//   title: string;
+//   description: string;
+//   address: string;
+//   creator?: Creator | string;
+//   location: {
+//     lat: number;
+//     lng: number;
+//   };
+//   creatorName?: string;
+//   creatorImage?: string;
+//   createdAt?: string;
+// }
 
 interface PlaceListProps {
   items: Place[];

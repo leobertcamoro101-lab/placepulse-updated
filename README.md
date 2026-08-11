@@ -3,7 +3,7 @@
 A MERN stack application.
 
 ## Frontend
-- React.js
+- React.js + TypeScript
 - CSS
 - Deployed on Vercel
 

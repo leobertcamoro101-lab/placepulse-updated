@@ -18,8 +18,11 @@ function MainNavigation() {
     <React.Fragment>
       {drawerIsOpen && <Backdrop onClick={closeDrawerHandler} />}
       <SideDrawer show={drawerIsOpen} onClick={closeDrawerHandler}>
-        <nav className="h-full">
+        <nav className="h-full flex flex-col">
           <NavLinks />
+          <div className="mt-auto border-t border-gray-100 pt-2">
+            <AccountMenu variant='inline'/>
+          </div>
         </nav>
       </SideDrawer>
 

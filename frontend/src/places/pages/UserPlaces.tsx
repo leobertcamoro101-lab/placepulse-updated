@@ -7,28 +7,29 @@ import PlaceList from '../components/PlaceList';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 
 import { useHttpClient } from "../../shared/hooks/http-hook";
+import { Place } from '../../shared/types/place';
 
-interface Creator {
-  _id?: string;
-  name?: string;
-  image?: string;
-}
+// interface Creator {
+//   _id?: string;
+//   name?: string;
+//   image?: string;
+// }
 
-interface Place {
-  id: string;
-  image: string;
-  title: string;
-  description: string;
-  address: string;
-  creator?: Creator | string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-  creatorName?: string;
-  creatorImage?: string;
-  createdAt?: string;
-}
+// interface Place {
+//   id: string;
+//   image: string;
+//   title: string;
+//   description: string;
+//   address: string;
+//   creator?: Creator | string;
+//   location: {
+//     lat: number;
+//     lng: number;
+//   };
+//   creatorName?: string;
+//   creatorImage?: string;
+//   createdAt?: string;
+// }
 
 interface UserPlacesProps {
   userId?: string;
