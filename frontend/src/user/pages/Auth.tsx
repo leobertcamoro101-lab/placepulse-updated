@@ -1,5 +1,6 @@
 import { useState, useContext, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useMutation } from '@tanstack/react-query';
 import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -21,11 +22,18 @@ const GENDER_OPTIONS = [
   { value: "custom", label: "Custom" },
 ];
 
+interface AuthResponse {
+  userId: string;
+  token: string;
+  name: string;
+  image: string;
+}
+
 function Auth() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { sendRequest } = useHttpClient();
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: { value: "", isValid: false },
@@ -33,6 +41,50 @@ function Auth() {
     },
     false
   );
+
+  const authMutation = useMutation({
+    mutationFn: async (): Promise<AuthResponse> => {
+      if (isLoginMode) {
+        return sendRequest(
+          import.meta.env.VITE_BACKEND_URL + "/users/login",
+          "POST",
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          { "Content-Type": "application/json" }
+        );
+      } else {
+        const formData = new FormData();
+        formData.append("firstName", formState.inputs.firstName.value as string);
+        formData.append("lastName", formState.inputs.lastName.value as string);
+        formData.append("birthday", formState.inputs.birthday.value as string);
+        formData.append("gender", formState.inputs.gender.value as string);
+        formData.append("email", formState.inputs.email.value as string);
+        formData.append("password", formState.inputs.password.value as string);
+
+        if (formState.inputs.image.value instanceof File) {
+          formData.append("image", formState.inputs.image.value);
+        }
+
+        return sendRequest(
+          import.meta.env.VITE_BACKEND_URL + "/users/signup",
+          "POST",
+          formData
+        );
+      }
+    },
+    onSuccess: (responseData) => {
+      auth.login(
+        responseData.userId,
+        responseData.token,
+        undefined,
+        responseData.name,
+        responseData.image
+      );
+      navigate("/places");
+    },
+  });
 
   const switchModeHandler = () => {
     if (!isLoginMode) {
@@ -63,64 +115,17 @@ function Auth() {
     setIsLoginMode((prevMode) => !prevMode);
   };
 
-  const authSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
+  const authSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (isLoginMode) {
-      try {
-        const responseData = await sendRequest(
-          import.meta.env.VITE_BACKEND_URL + "/users/login",
-          "POST",
-          JSON.stringify({
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          { "Content-Type": "application/json" }
-        );
-        auth.login(
-          responseData.userId,
-          responseData.token,
-          undefined,
-          responseData.name,
-          responseData.image
-        );
-        navigate("/places");
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      try {
-        const formData = new FormData();
-        formData.append("firstName", formState.inputs.firstName.value as string);
-        formData.append("lastName", formState.inputs.lastName.value as string);
-        formData.append("birthday", formState.inputs.birthday.value as string);
-        formData.append("gender", formState.inputs.gender.value as string);
-        formData.append("email", formState.inputs.email.value as string);
-        formData.append("password", formState.inputs.password.value as string);
-        formData.append("image", formState.inputs.image.value as File);
-
-        const responseData = await sendRequest(
-          import.meta.env.VITE_BACKEND_URL + "/users/signup",
-          "POST",
-          formData
-        );
-        auth.login(
-          responseData.userId,
-          responseData.token,
-          undefined,
-          responseData.name,
-          responseData.image
-        );
-        navigate("/places");
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    authMutation.mutate();
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={authMutation.error instanceof Error ? authMutation.error.message : undefined}
+        onClear={() => authMutation.reset()}
+      />
       <div className="min-h-screen flex items-start justify-center pt-20 bg-white">
         <Card className="w-full max-w-[28rem] px-6 py-8 mb-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -132,7 +137,7 @@ function Auth() {
             </p>
           )}
 
-          {isLoading && <LoadingSpinner asOverlay />}
+          {authMutation.isPending && <LoadingSpinner asOverlay />}
 
           <form onSubmit={authSubmitHandler}>
             {!isLoginMode && (

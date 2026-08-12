@@ -5,6 +5,7 @@ import { cn } from '../../utils/cn';
 interface ButtonProps {
   href?: string;
   to?: string;
+  state?: unknown;
   exact?: boolean;
   size?: 'small' | 'big';
   inverse?: boolean;
@@ -19,6 +20,7 @@ interface ButtonProps {
 function Button({
   href,
   to,
+  state,
   size,
   inverse,
   danger,
@@ -63,7 +65,7 @@ function Button({
 
   if (to) {
     return (
-      <Link to={to} className={combinedClasses}>
+      <Link to={to} state={state} className={combinedClasses}>
         {children}
       </Link>
     );

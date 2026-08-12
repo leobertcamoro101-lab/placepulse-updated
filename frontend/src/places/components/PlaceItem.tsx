@@ -1,6 +1,8 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { MoreHorizontal, MapPin, Pencil, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, 
+  // useLocation 
+} from "react-router-dom";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import InfoModal from "../../shared/components/UIElements/InfoModal";
@@ -46,6 +48,7 @@ const PlaceItem = ({
 }: PlaceItemProps) => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
+  // const location = useLocation();
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -182,6 +185,7 @@ const PlaceItem = ({
                   {isOwner && (
                     <Button
                       to={`/places/${id}`}
+                      // state={{ from: location.pathname }}
                       className="!w-full !flex !items-center !gap-2 !px-4 !py-2 !text-sm !text-gray-700 hover:!bg-gray-100 !bg-transparent !border-0 !rounded-none !m-0 !justify-start"
                     >
                       <Pencil size={16} /> Edit

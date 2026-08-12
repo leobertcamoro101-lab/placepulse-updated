@@ -1,5 +1,8 @@
-import { useEffect, useState, useContext, FormEvent } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useContext, FormEvent } from "react";
+import { useParams, useNavigate, 
+  // useLocation 
+} from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -25,10 +28,12 @@ interface Place {
 
 function UpdatePlace() {
   const auth = useContext(AuthContext);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const [loadedPlace, setLoadedPlace] = useState<Place>();
+  const { sendRequest } = useHttpClient();
   const { placeId } = useParams();
   const navigate = useNavigate();
+  // const location = useLocation();
+  // const fromPath = (location.state as { from?: string })?.from;
+  const queryClient = useQueryClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -38,33 +43,32 @@ function UpdatePlace() {
     false
   );
 
-  useEffect(() => {
-    const fetchPlace = async () => {
-      try {
-        const responseData = await sendRequest(
-          `${import.meta.env.VITE_BACKEND_URL}/places/${placeId}`
-        );
-        if (responseData) {
-          setLoadedPlace(responseData.place);
-          setFormData(
-            {
-              title: { value: responseData.place.title, isValid: true },
-              description: { value: responseData.place.description, isValid: true },
-            },
-            true
-          );
-        }
-      } catch (err) {
-        console.log(err);
+  const { data: loadedPlace, isLoading, error, refetch } = useQuery({
+    queryKey: ['place', placeId],
+    queryFn: async () => {
+      const responseData = await sendRequest(
+        `${import.meta.env.VITE_BACKEND_URL}/places/${placeId}`
+      );
+      if (!responseData) {
+        // throw new Error('Request was cancelled, please try again.'); //commented to never to see again in ErrorModal
+        throw new Error("__silent_abort__"); // to silence the abort()
       }
-    };
-    fetchPlace();
-  }, [sendRequest, placeId, setFormData]);
+      const place = responseData.place as Place;
+      setFormData(
+        {
+          title: { value: place.title, isValid: true },
+          description: { value: place.description, isValid: true },
+        },
+        true
+      );
+      return place;
+    },
+    enabled: !!placeId,
+  });
 
-  const placeUpdateSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      await sendRequest(
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      return sendRequest(
         `${import.meta.env.VITE_BACKEND_URL}/places/${placeId}`,
         "PATCH",
         JSON.stringify({
@@ -76,10 +80,19 @@ function UpdatePlace() {
           Authorization: "Bearer " + auth.token,
         }
       );
-      navigate("/" + auth.userId + "/places");
-    } catch (err) {
-      console.log(err);
-    }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['places'] });
+      queryClient.invalidateQueries({ queryKey: ['places', 'user', auth.userId] });
+      queryClient.invalidateQueries({ queryKey: ['place', placeId] });
+      navigate(-1); // simplicity of my app
+      // navigate(fromPath || "/" + auth.userId + "/places"); // precise control
+    },
+  });
+
+  const placeUpdateSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    updateMutation.mutate();
   };
 
   if (isLoading) {
@@ -102,7 +115,33 @@ function UpdatePlace() {
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      {/* commented to silence the abort() */}  
+      {/* <ErrorModal
+        error={
+          error instanceof Error
+            ? error.message
+            : updateMutation.error instanceof Error
+            ? updateMutation.error.message
+            : undefined
+        }
+        onClear={() => {
+          refetch();
+          updateMutation.reset();
+        }}
+      /> */}
+      <ErrorModal
+        error={
+          error instanceof Error && error.message !== "__silent_abort__"
+            ? error.message
+            : updateMutation.error instanceof Error
+            ? updateMutation.error.message
+            : undefined
+        }
+        onClear={() => {
+          refetch();
+          updateMutation.reset();
+        }}
+      />
       {!isLoading && loadedPlace && (
         <Card className="w-[90%] max-w-[35rem] mx-auto my-4 p-0 overflow-visible">
           <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-100">
@@ -118,6 +157,7 @@ function UpdatePlace() {
 
           <form onSubmit={placeUpdateSubmitHandler} className="px-4 pb-4">
             <Input
+              key={loadedPlace.title}
               id="title"
               element="input"
               type="text"
@@ -129,6 +169,7 @@ function UpdatePlace() {
               className="w-full !border-0 !px-0 !py-2 text-xl font-medium placeholder:text-gray-500 focus:!outline-none"
             />
             <Input
+              key={loadedPlace.description}
               id="description"
               element="textarea"
               validators={[VALIDATOR_MINLENGTH(5)]}

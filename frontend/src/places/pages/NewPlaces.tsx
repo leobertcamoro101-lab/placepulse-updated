@@ -1,5 +1,6 @@
 import { useContext, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Image as ImageIcon } from 'lucide-react';
 import Input from '../../shared/components/FormElements/Input';
 import ImageUpload from '../../shared/components/FormElements/ImageUpload';
@@ -18,7 +19,10 @@ import { AuthContext } from '../../shared/context/auth-context';
 
 function NewPlace() {
   const auth = useContext(AuthContext);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { sendRequest } = useHttpClient();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const [formState, inputHandler] = useForm(
     {
       title: { value: '', isValid: false },
@@ -28,11 +32,9 @@ function NewPlace() {
     },
     false
   );
-  const navigate = useNavigate();
 
-  const placeSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
+  const createMutation = useMutation({
+    mutationFn: async () => {
       const formData = new FormData();
       formData.append('title', formState.inputs.title.value as string);
       formData.append('description', formState.inputs.description.value as string);
@@ -42,24 +44,33 @@ function NewPlace() {
         formData.append('image', formState.inputs.image.value);
       }
 
-      await sendRequest(
+      return sendRequest(
         import.meta.env.VITE_BACKEND_URL + '/places/',
         'POST',
         formData,
         { Authorization: 'Bearer ' + auth.token }
       );
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['places'] });
+      queryClient.invalidateQueries({ queryKey: ['places', 'user', auth.userId] });
       navigate(`/${auth.userId}/places`);
-    } catch (err) {
-      console.log(err);
-    }
+    },
+  });
+
+  const placeSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    createMutation.mutate();
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={createMutation.error instanceof Error ? createMutation.error.message : undefined}
+        onClear={() => createMutation.reset()}
+      />
       <Card className="w-[90%] max-w-[35rem] mx-auto my-4 p-0 overflow-visible">
-        {isLoading && <LoadingSpinner asOverlay />}
+        {createMutation.isPending && <LoadingSpinner asOverlay />}
 
         <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900 m-0">Create Post</h2>

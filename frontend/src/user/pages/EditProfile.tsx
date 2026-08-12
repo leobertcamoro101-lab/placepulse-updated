@@ -1,5 +1,6 @@
-import { useEffect, useState, useContext, FormEvent } from 'react';
+import { useContext, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Card from '../../shared/components/UIElements/Card';
 import Avatar from '../../shared/components/UIElements/Avatar';
 import Input from '../../shared/components/FormElements/Input';
@@ -35,8 +36,8 @@ interface LoadedUser {
 function EditProfile() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const [loadedUser, setLoadedUser] = useState<LoadedUser>();
+  const { sendRequest } = useHttpClient();
+  const queryClient = useQueryClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -50,36 +51,34 @@ function EditProfile() {
     false
   );
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const responseData = await sendRequest(
-          `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`
-        );
-        if (responseData) {
-          setLoadedUser(responseData.user);
-          setFormData(
-            {
-              firstName: { value: responseData.user.firstName, isValid: true },
-              lastName: { value: responseData.user.lastName, isValid: true },
-              birthday: { value: responseData.user.birthday?.slice(0, 10) || '', isValid: true },
-              gender: { value: responseData.user.gender, isValid: true },
-              email: { value: responseData.user.email, isValid: true },
-              image: { value: undefined, isValid: true },
-            },
-            true
-          );
-        }
-      } catch (err) {
-        console.log(err);
+  const { data: loadedUser, isLoading, error, refetch } = useQuery({
+    queryKey: ['user', auth.userId],
+    queryFn: async () => {
+      const responseData = await sendRequest(
+        `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`
+      );
+      if (!responseData) {
+        throw new Error('__silent_abort__');
       }
-    };
-    fetchUser();
-  }, [sendRequest, auth.userId, setFormData]);
+      const user = responseData.user as LoadedUser;
+      setFormData(
+        {
+          firstName: { value: user.firstName, isValid: true },
+          lastName: { value: user.lastName, isValid: true },
+          birthday: { value: user.birthday?.slice(0, 10) || '', isValid: true },
+          gender: { value: user.gender, isValid: true },
+          email: { value: user.email, isValid: true },
+          image: { value: undefined, isValid: true },
+        },
+        true
+      );
+      return user;
+    },
+    enabled: !!auth.userId,
+  });
 
-  const submitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
+  const updateMutation = useMutation({
+    mutationFn: async () => {
       const formData = new FormData();
       formData.append('firstName', formState.inputs.firstName.value as string);
       formData.append('lastName', formState.inputs.lastName.value as string);
@@ -91,18 +90,24 @@ function EditProfile() {
         formData.append('image', formState.inputs.image.value);
       }
 
-      const responseData = await sendRequest(
+      return sendRequest(
         `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
         'PATCH',
         formData,
         { Authorization: 'Bearer ' + auth.token }
       );
-
+    },
+    onSuccess: (responseData) => {
       auth.updateUserInfo(responseData.user.name, responseData.user.image);
+      queryClient.invalidateQueries({ queryKey: ['user', auth.userId] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
       navigate('/profile');
-    } catch (err) {
-      console.log(err);
-    }
+    },
+  });
+
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    updateMutation.mutate();
   };
 
   if (isLoading && !loadedUser) {
@@ -115,7 +120,19 @@ function EditProfile() {
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={
+          error instanceof Error && error.message !== '__silent_abort__'
+            ? error.message
+            : updateMutation.error instanceof Error
+            ? updateMutation.error.message
+            : undefined
+        }
+        onClear={() => {
+          refetch();
+          updateMutation.reset();
+        }}
+      />
       {loadedUser && (
         <div className="flex justify-center px-4">
           <Card className="w-full max-w-[30rem] p-6 mt-8">
@@ -131,6 +148,7 @@ function EditProfile() {
             <form onSubmit={submitHandler}>
               <div className="flex gap-3">
                 <Input
+                  key={loadedUser.firstName}
                   element="input"
                   id="firstName"
                   type="text"
@@ -142,6 +160,7 @@ function EditProfile() {
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-base focus:outline-none focus:border-blue-500"
                 />
                 <Input
+                  key={loadedUser.lastName}
                   element="input"
                   id="lastName"
                   type="text"
@@ -155,6 +174,7 @@ function EditProfile() {
               </div>
 
               <Input
+                key={loadedUser.birthday}
                 element="input"
                 id="birthday"
                 type="date"
@@ -167,6 +187,7 @@ function EditProfile() {
               />
 
               <Input
+                key={loadedUser.gender}
                 element="select"
                 id="gender"
                 label="Gender"
@@ -179,6 +200,7 @@ function EditProfile() {
               />
 
               <Input
+                key={loadedUser.email}
                 element="input"
                 id="email"
                 type="email"

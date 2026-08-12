@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -10,34 +11,41 @@ import { useForm } from '../../shared/hooks/form-hooks';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 
 function ForgotPassword() {
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { sendRequest } = useHttpClient();
   const [submitted, setSubmitted] = useState(false);
   const [formState, inputHandler] = useForm(
     { email: { value: '', isValid: false } },
     false
   );
 
-  const submitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      await sendRequest(
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async () => {
+      return sendRequest(
         import.meta.env.VITE_BACKEND_URL + '/users/forgot-password',
         'POST',
         JSON.stringify({ email: formState.inputs.email.value }),
         { 'Content-Type': 'application/json' }
       );
+    },
+    onSuccess: () => {
       setSubmitted(true);
-    } catch (err) {
-      console.log(err);
-    }
+    },
+  });
+
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    forgotPasswordMutation.mutate();
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={forgotPasswordMutation.error instanceof Error ? forgotPasswordMutation.error.message : undefined}
+        onClear={() => forgotPasswordMutation.reset()}
+      />
       <div className="min-h-screen flex items-start justify-center pt-20 bg-white">
         <Card className="w-full max-w-[28rem] px-6 py-8">
-          {isLoading && <LoadingSpinner asOverlay />}
+          {forgotPasswordMutation.isPending && <LoadingSpinner asOverlay />}
 
           {submitted ? (
             <>

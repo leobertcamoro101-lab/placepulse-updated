@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -12,35 +13,42 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { sendRequest } = useHttpClient();
   const [success, setSuccess] = useState(false);
   const [formState, inputHandler] = useForm(
     { password: { value: '', isValid: false } },
     false
   );
 
-  const submitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      await sendRequest(
+  const resetPasswordMutation = useMutation({
+    mutationFn: async () => {
+      return sendRequest(
         import.meta.env.VITE_BACKEND_URL + '/users/reset-password',
         'POST',
         JSON.stringify({ token, password: formState.inputs.password.value }),
         { 'Content-Type': 'application/json' }
       );
+    },
+    onSuccess: () => {
       setSuccess(true);
       setTimeout(() => navigate('/profile'), 2000);
-    } catch (err) {
-      console.log(err);
-    }
+    },
+  });
+
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    resetPasswordMutation.mutate();
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={resetPasswordMutation.error instanceof Error ? resetPasswordMutation.error.message : undefined}
+        onClear={() => resetPasswordMutation.reset()}
+      />
       <div className="min-h-screen flex items-start justify-center pt-20 bg-white">
         <Card className="w-full max-w-[28rem] px-6 py-8">
-          {isLoading && <LoadingSpinner asOverlay />}
+          {resetPasswordMutation.isPending && <LoadingSpinner asOverlay />}
 
           {success ? (
             <>

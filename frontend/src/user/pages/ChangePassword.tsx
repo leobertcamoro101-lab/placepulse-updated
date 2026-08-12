@@ -1,5 +1,6 @@
 import { useContext, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -13,7 +14,7 @@ import { AuthContext } from '../../shared/context/auth-context';
 function ChangePassword() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const { sendRequest } = useHttpClient();
   const [successMsg, setSuccessMsg] = useState('');
 
   const [formState, inputHandler] = useForm(
@@ -24,11 +25,9 @@ function ChangePassword() {
     false
   );
 
-  const submitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSuccessMsg('');
-    try {
-      await sendRequest(
+  const changePasswordMutation = useMutation({
+    mutationFn: async () => {
+      return sendRequest(
         `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}/password`,
         'PATCH',
         JSON.stringify({
@@ -40,19 +39,28 @@ function ChangePassword() {
           Authorization: 'Bearer ' + auth.token,
         }
       );
+    },
+    onSuccess: () => {
       setSuccessMsg('Password updated. Redirecting...');
       setTimeout(() => navigate('/profile'), 1500);
-    } catch (err) {
-      console.log(err);
-    }
+    },
+  });
+
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSuccessMsg('');
+    changePasswordMutation.mutate();
   };
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      <ErrorModal
+        error={changePasswordMutation.error instanceof Error ? changePasswordMutation.error.message : undefined}
+        onClear={() => changePasswordMutation.reset()}
+      />
       <div className="flex justify-center px-4">
         <Card className="w-full max-w-[28rem] p-6 mt-8">
-          {isLoading && <LoadingSpinner asOverlay />}
+          {changePasswordMutation.isPending && <LoadingSpinner asOverlay />}
           <h2 className="text-xl font-bold text-gray-900 mb-4">Change Password</h2>
 
           <form onSubmit={submitHandler}>

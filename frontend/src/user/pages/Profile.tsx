@@ -1,12 +1,13 @@
-import { useEffect, useState, useContext } from 'react';
-import Card from '../../shared/components/UIElements/Card';
-import Avatar from '../../shared/components/UIElements/Avatar';
-import Button from '../../shared/components/FormElements/Button';
-import UserPlaces from '../../places/pages/UserPlaces';
-import ErrorModal from '../../shared/components/UIElements/ErrorModal';
-import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
-import { useHttpClient } from '../../shared/hooks/http-hook';
-import { AuthContext } from '../../shared/context/auth-context';
+import { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Card from "../../shared/components/UIElements/Card";
+import Avatar from "../../shared/components/UIElements/Avatar";
+import Button from "../../shared/components/FormElements/Button";
+import UserPlaces from "../../places/pages/UserPlaces";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../shared/context/auth-context";
 
 interface LoadedUser {
   id: string;
@@ -21,24 +22,27 @@ interface LoadedUser {
 
 function Profile() {
   const auth = useContext(AuthContext);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const [loadedUser, setLoadedUser] = useState<LoadedUser>();
+  const { sendRequest } = useHttpClient();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const responseData = await sendRequest(
-          `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`
-        );
-        if (responseData) {
-          setLoadedUser(responseData.user);
-        }
-      } catch (err) {
-        console.log(err);
+  const {
+    data: loadedUser,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["user", auth.userId],
+    queryFn: async () => {
+      const responseData = await sendRequest(
+        `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
+      );
+      if (!responseData) {
+        // throw new Error("Request was cancelled, please try again."); //commented to never to see again in ErrorModal
+        throw new Error("__silent_abort__"); // to silence the abort()
       }
-    };
-    fetchUser();
-  }, [sendRequest, auth.userId]);
+      return responseData.user as LoadedUser;
+    },
+    enabled: !!auth.userId,
+  });
 
   if (isLoading && !loadedUser) {
     return (
@@ -50,15 +54,30 @@ function Profile() {
 
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
+      {/* commented to silence the abort() */}
+      {/* <ErrorModal error={error instanceof Error ? error.message : undefined} onClear={() => refetch()} /> */}
+      <ErrorModal
+        error={
+          error instanceof Error && error.message !== "__silent_abort__"
+            ? error.message
+            : undefined
+        }
+        onClear={() => refetch()}
+      />
       {loadedUser && (
         <div className="flex justify-center px-4">
           <Card className="w-full max-w-[30rem] p-6 mt-8">
             <div className="flex flex-col items-center text-center mb-6">
               <div className="w-24 h-24 mb-3">
-                <Avatar image={loadedUser.image} alt={loadedUser.name} width="96px" />
+                <Avatar
+                  image={loadedUser.image}
+                  alt={loadedUser.name}
+                  width="96px"
+                />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 m-0">{loadedUser.name}</h2>
+              <h2 className="text-xl font-bold text-gray-900 m-0">
+                {loadedUser.name}
+              </h2>
               <p className="text-gray-500 text-sm m-0">{loadedUser.email}</p>
             </div>
 
@@ -67,13 +86,17 @@ function Profile() {
                 <p className="text-gray-500 m-0 mb-1">Birthday</p>
                 <p className="text-gray-900 font-medium m-0">
                   {new Date(loadedUser.birthday).toLocaleDateString(undefined, {
-                    year: 'numeric', month: 'long', day: 'numeric'
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500 m-0 mb-1">Gender</p>
-                <p className="text-gray-900 font-medium m-0 capitalize">{loadedUser.gender}</p>
+                <p className="text-gray-900 font-medium m-0 capitalize">
+                  {loadedUser.gender}
+                </p>
               </div>
             </div>
 
@@ -95,7 +118,9 @@ function Profile() {
           </Card>
         </div>
       )}
-      {!isLoading && loadedUser && auth.userId && (<UserPlaces userId={auth.userId} />)}
+      {!isLoading && loadedUser && auth.userId && (
+        <UserPlaces userId={auth.userId} />
+      )}
     </>
   );
 }
