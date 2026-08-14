@@ -64,7 +64,7 @@ function Input({
   label,
   errorText,
   className,
-  options,
+  options, // NEW — array of { value, label } for element="select"
 }: InputProps) {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: initialValue,

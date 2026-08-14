@@ -46,7 +46,7 @@ export const useHttpClient = () => {
         stopLoading();
         return responseData;
       } catch (err) {
-        stopLoading();
+        stopLoading(); // NEW — must fire on every exit path, including abort/error
         if (err instanceof Error && err.name === "AbortError") {
           return;
         }

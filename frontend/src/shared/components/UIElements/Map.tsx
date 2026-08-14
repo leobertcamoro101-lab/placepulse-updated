@@ -37,6 +37,7 @@ function Map({ center, zoom, className, style }: MapProps) {
     });
     mapInstanceRef.current = map;
 
+    // still useful for real resizes (window resize, sidebar toggle, etc.)
     const resizeObserver = new ResizeObserver(() => map.updateSize());
     resizeObserver.observe(mapRef.current);
 
@@ -47,6 +48,7 @@ function Map({ center, zoom, className, style }: MapProps) {
     };
   }, [center, zoom]);
 
+  // Fix sizing once the modal's transition has actually finished
   useEffect(() => {
     if (isModalReady && mapInstanceRef.current) {
       mapInstanceRef.current.updateSize();

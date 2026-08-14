@@ -8,8 +8,12 @@ import LoadingSpinner from '../UIElements/LoadingSpinner';
 function RootLayout() {
   const location = useLocation();
   const { token } = useContext(AuthContext);
-  const hideNav = location.pathname === '/' && !token;
-
+  // const hideNav = location.pathname === '/' && !token;
+  const publicPaths = ['/', '/forgot-password'];
+  const hideNav = !token && (
+  publicPaths.includes(location.pathname) ||
+  location.pathname.startsWith('/reset-password/')
+);
   return (
     <>
       {!hideNav && <MainNavigation />}

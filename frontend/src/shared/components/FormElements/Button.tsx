@@ -44,7 +44,7 @@ function Button({
   } else {
     variantClasses = 'bg-[#ff0055] border-[#ff0055] text-white hover:bg-[#ff4382] hover:border-[#ff4382] active:bg-[#ff4382] active:border-[#ff4382]';
   }
-
+  // disabled always wins, regardless of what className passes in
   const disabledClasses = 'disabled:bg-[#ccc] disabled:text-[#979797] disabled:border-[#ccc] disabled:cursor-not-allowed disabled:hover:bg-[#ccc] disabled:hover:border-[#ccc]';
 
   const combinedClasses = cn(

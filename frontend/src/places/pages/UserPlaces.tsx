@@ -29,7 +29,7 @@ function UserPlaces({ userId: propUserId }: UserPlacesProps) {
   } = useQuery({
     queryKey: ["places", "user", userId],
     queryFn: async () => {
-      // commented need to try catch because "No Created Place. Maybe create one?" no display
+      // commented need to try catch because infinite loop and "No Created Place. Maybe create one?" no display
       // const responseData = await sendRequest(
       //   `${import.meta.env.VITE_BACKEND_URL}/places/user/${userId}`,
       // );
@@ -118,7 +118,8 @@ function UserPlaces({ userId: propUserId }: UserPlacesProps) {
           </Card>
         </div>
       )}
-      {!isLoading && loadedPlaces && loadedPlaces.length > 0 &&(
+      
+      {!isLoading && loadedPlaces && loadedPlaces.length > 0 && (
         <PlaceList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />
       )}
     </>

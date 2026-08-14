@@ -1,16 +1,12 @@
 import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
-import dns from "node:dns/promises";
 
 import placesRoutes from "./routes/places-routes";
 import usersRoutes from "./routes/users-routes";
 import HttpError from "./models/http-error";
-
-dns.setServers(["1.1.1.1", "8.8.8.8"]); // << if error connection do this
 
 const app = express();
 
@@ -71,20 +67,5 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred" });
 });
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-mongoose
-  .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.accdk79.mongodb.net/${process.env.DB_NAME}?appName=Cluster0`
-  )
-  .then(() => console.log("MongoDB connected"))
-  .catch((err: unknown) => {
-    console.log(err);
-  });
 
 export default app;

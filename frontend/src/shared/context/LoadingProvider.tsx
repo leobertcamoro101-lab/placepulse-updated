@@ -6,7 +6,7 @@ import { LoadingContext } from './loading-context';
 interface LoadingProviderProps {
   children: ReactNode;
 }
-
+// NProgress.configure({ showSpinner: false }); // remove the small spinner at the side uncomment this if you want // NEW
 export function LoadingProvider({ children }: LoadingProviderProps) {
   const activeRequests = useRef(0);
 

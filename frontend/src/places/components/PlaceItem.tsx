@@ -65,6 +65,7 @@ const PlaceItem = ({
   };
   const cancelDeleteHandler = () => setShowConfirmModal(false);
 
+  // Close the dropdown when clicking anywhere outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -95,13 +96,13 @@ const PlaceItem = ({
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
-
+      {/* Map Modal */}
       <InfoModal show={showMap} onCancel={closeMapHandler} icon={MapPin} title={address}>
         <div className="h-60 w-full">
           <Map center={coordinates} zoom={16} />
         </div>
       </InfoModal>
-
+      {/* Delete Confirmation Modal */}
       <ConfirmModal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
@@ -111,11 +112,11 @@ const PlaceItem = ({
         confirmText="Delete"
         cancelText="Cancel"
       />
-
+      {/* Facebook-style Post Card */}
       <li className="my-4 list-none w-full max-w-[40rem] mx-auto">
         <Card className="p-0 overflow-visible">
           {isLoading && <LoadingSpinner asOverlay />}
-
+          {/* Post header: avatar, name, date, three-dot menu */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               {isOwner ? (
@@ -204,13 +205,13 @@ const PlaceItem = ({
               )}
             </div>
           </div>
-
+          {/* Post body: title + description */}
           <div className="px-4 pb-3">
             <h2 className="text-lg font-semibold text-gray-900 m-0 mb-1">{title}</h2>
             <p className="text-sm text-gray-600 m-0">{address}</p>
             <p className="text-sm text-gray-800 mt-2 m-0">{description}</p>
           </div>
-
+          {/* Post image */}
           <div className="w-full h-64 md:h-96">
             <img src={image} alt={title} className="h-full w-full object-cover" />
           </div>
