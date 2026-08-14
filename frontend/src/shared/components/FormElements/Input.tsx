@@ -142,6 +142,7 @@ function Input({
       <textarea
         id={id}
         rows={rows}
+        placeholder={placeholder}
         onChange={changeHandler}
         onBlur={touchHandler}
         value={value}

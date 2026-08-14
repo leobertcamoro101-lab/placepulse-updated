@@ -46,10 +46,10 @@ const fillTextFields = async (user: ReturnType<typeof userEvent.setup>) => {
     screen.getByPlaceholderText(/what.s the name of the place/i),
     "Test Place"
   );
-  // Input.tsx doesn't forward the `placeholder` prop for element="textarea",
-  // so the description field has no placeholder in the DOM — target by id instead.
-  const descriptionField = document.getElementById("description") as HTMLTextAreaElement;
-  await user.type(descriptionField, "A lovely spot to visit.");
+  await user.type(
+    screen.getByPlaceholderText(/share more about this place/i),
+    "A lovely spot to visit."
+  );
   await user.type(screen.getByPlaceholderText(/^address$/i), "123 Main St");
 };
 
