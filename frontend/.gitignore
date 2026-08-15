@@ -27,3 +27,4 @@ dist-ssr
 *.sw?
 
 npm test
+npx vitest run --coverage
