@@ -17,4 +17,9 @@ beforeEach(() => {
     backdropHook.id = "backdrop-hook";
     document.body.appendChild(backdropHook);
   }
+  if (!document.getElementById("drawer-hook")) {
+    const drawerHook = document.createElement("div");
+    drawerHook.id = "drawer-hook";
+    document.body.appendChild(drawerHook);
+  }
 });

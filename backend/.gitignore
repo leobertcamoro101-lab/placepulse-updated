@@ -4,5 +4,6 @@ upload/images
 nodemon.json
 .gitignore
 dist/
+coverage/
 
 npx ts-node scripts/cleanup-orphaned-images.ts  

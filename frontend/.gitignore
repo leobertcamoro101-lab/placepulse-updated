@@ -11,6 +11,7 @@ node_modules
 dist
 .env
 .env.production
+coverage/
 dist-ssr
 *.local
 
@@ -24,3 +25,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+npm test
