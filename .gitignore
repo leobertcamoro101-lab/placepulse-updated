@@ -14,3 +14,9 @@ backend/node_modules
 backend/.env
 backend/nodemon.json
 backend/uploads/images
+
+
+playwright
+cd e2e
+npx playwright test --ui
+npx playwright test
