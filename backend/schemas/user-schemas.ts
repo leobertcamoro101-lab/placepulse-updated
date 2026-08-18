@@ -5,7 +5,7 @@ export const signupSchema = z.object({
   lastName: z.string().trim().min(1, "Last name is required."),
   birthday: z.string().trim().min(1, "Birthday is required."),
   gender: z.enum(["female", "male", "custom"], {
-    errorMap: () => ({ message: "Gender must be female, male, or custom." }),
+    error: "Gender must be female, male, or custom.",
   }),
   email: z.string().trim().email("Please provide a valid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
@@ -16,7 +16,7 @@ export const updateProfileSchema = z.object({
   lastName: z.string().trim().min(1, "Last name is required."),
   birthday: z.string().trim().min(1, "Birthday is required."),
   gender: z.enum(["female", "male", "custom"], {
-    errorMap: () => ({ message: "Gender must be female, male, or custom." }),
+    error: "Gender must be female, male, or custom.",
   }),
   email: z.string().trim().email("Please provide a valid email address."),
 });
