@@ -5,6 +5,9 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: "html",
+  // Refuses to run any test if the backend isn't confirmed connected to
+  // the dedicated E2E database — see global-setup.ts.
+  globalSetup: "./global-setup.ts",
   use: {
     // Must match app.ts's CORS allowedOrigins exactly ("localhost", not
     // "127.0.0.1") — this is what the real browser navigates to and sends
@@ -30,6 +33,13 @@ export default defineConfig({
       port: 5000,
       timeout: 120000,
       reuseExistingServer: !process.env.CI,
+      // Overrides DB_NAME for this spawned process only — dotenv never
+      // overwrites a variable that's already set in the environment, so
+      // this wins over whatever DB_NAME your backend/.env has, without
+      // editing that file or affecting normal `npm run dev` elsewhere.
+      env: {
+        DB_NAME: "playwright_e2e",
+      },
     },
     {
       command: "npm run dev",
