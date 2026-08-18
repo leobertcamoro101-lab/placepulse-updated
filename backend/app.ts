@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import mongoose from "mongoose";
 
 import placesRoutes from "./routes/places-routes";
 import usersRoutes from "./routes/users-routes";
@@ -39,6 +40,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
   next();
+});
+
+// Reports which database Mongo is actually connected to — used by the E2E
+// test suite's global setup to refuse to run against the wrong database
+// (e.g. if a manually-started backend is reused instead of one spawned
+// with the test DB_NAME override). connection.name is undefined until the
+// connection finishes, which the caller should account for by polling.
+app.get("/health", (req: Request, res: Response) => {
+  res.json({ dbName: mongoose.connection.name || null });
 });
 
 app.use("/api/places", placesRoutes);

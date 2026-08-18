@@ -10,7 +10,9 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cleanup:cloudinary": "ts-node scripts/cleanup-orphaned-images.ts ",
+    "cleanup:e2e": "ts-node scripts/cleanup-e2e-data.ts"
   },
   "dependencies": {
     "axios": "^1.18.1",

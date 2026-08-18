@@ -11,4 +11,5 @@ npm test
 
 npx vitest run --coverage
 
-npx ts-node scripts/cleanup-orphaned-images.ts  
+npx ts-node scripts/cleanup-orphaned-images.ts
+npx ts-node scripts/cleanup-e2e-data.ts  
