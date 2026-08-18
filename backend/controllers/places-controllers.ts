@@ -1,5 +1,4 @@
 import { Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
 import mongoose from "mongoose";
 
 import HttpError from "../models/http-error";
@@ -52,8 +51,8 @@ const getPlacesByUserId = async (req: AuthRequest, res: Response, next: NextFunc
 };
 
 const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
+
+  if (req.validationError) {
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
     return next(new HttpError("Invalid inputs passed, please check your data.", 422));
   }
@@ -112,8 +111,8 @@ const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) 
 };
 
 const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
+
+  if (req.validationError) {
     return next(new HttpError("Invalid inputs passed, please check your data.", 422)); // change throw to next, when working async code throw will not work correctly, we add return because we no longer throwing an error
   }
   const { title, description } = req.body;

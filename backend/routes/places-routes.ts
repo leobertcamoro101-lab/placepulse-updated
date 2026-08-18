@@ -1,5 +1,6 @@
 import express from "express";
-import { check } from "express-validator";
+import { validateBody } from "../middleware/validate-zod";
+import { createPlaceSchema, updatePlaceSchema } from "../schemas/place-schemas";
 
 import * as placesControllers from "../controllers/places-controllers";
 import { upload, uploadToCloudinary } from "../middleware/file-upload";
@@ -20,9 +21,7 @@ router.post(
   upload.single("image"),
   uploadToCloudinary,
   [
-    check("title").not().isEmpty(),
-    check("description").isLength({ min: 5 }),
-    check("address").not().isEmpty(),
+    validateBody(createPlaceSchema),
   ],
   placesControllers.createPlace
 );
@@ -30,8 +29,7 @@ router.post(
 router.patch(
   "/:pid",
   [
-    check("title").not().isEmpty(),
-    check("description").isLength({ min: 5 }),
+    validateBody(updatePlaceSchema),
   ],
   placesControllers.updatePlace
 );

@@ -1,5 +1,6 @@
 import express from "express";
-import { check } from "express-validator";
+import { validateBody } from "../middleware/validate-zod";
+import { signupSchema, updateProfileSchema } from "../schemas/user-schemas";
 import rateLimit from "express-rate-limit";
 
 import * as usersControllers from "../controllers/users-controllers";
@@ -31,12 +32,7 @@ router.post(
   upload.single("image"),
   uploadToCloudinary,
   [
-    check("firstName").not().isEmpty(),
-    check("lastName").not().isEmpty(),
-    check("birthday").not().isEmpty(),
-    check("gender").isIn(["female", "male", "custom"]),
-    check("email").isEmail(),
-    check("password").isLength({ min: 6 }),
+    validateBody(signupSchema),
   ],
   usersControllers.signup
 );
@@ -52,11 +48,7 @@ router.patch(
   upload.single("image"),
   uploadToCloudinary,
   [
-    check("firstName").not().isEmpty(),
-    check("lastName").not().isEmpty(),
-    check("birthday").not().isEmpty(),
-    check("gender").isIn(["female", "male", "custom"]),
-    check("email").isEmail(),
+    validateBody(updateProfileSchema),
   ],
   usersControllers.updateProfile
 );

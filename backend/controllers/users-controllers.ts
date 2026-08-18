@@ -1,5 +1,4 @@
 import { Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -39,8 +38,8 @@ const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) 
 };
 
 const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
+
+  if (req.validationError) {
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
     return next(new HttpError("Invalid inputs passed, please check your data.", 422));
   }
@@ -232,8 +231,8 @@ const resetPassword = async (req: AuthRequest, res: Response, next: NextFunction
 };
 
 const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
+
+  if (req.validationError) {
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
     return next(new HttpError("Invalid inputs passed, please check your data.", 422));
   }

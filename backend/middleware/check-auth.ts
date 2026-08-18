@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
   userData?: {
     userId: string;
   };
+  validationError?: string; // ← add this line for Zod
 }
 
 interface DecodedToken {
