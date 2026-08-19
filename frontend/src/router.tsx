@@ -1,11 +1,11 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
 
 import RootLayout from './shared/components/Navigation/RootLayout';
 import RequireAuth from './shared/components/Navigation/RequireAuth';
 import RedirectIfAuthenticated from './shared/components/Navigation/RedirectIfAuthenticated';
 import { Users, NewPlace, UserPlaces, UpdatePlace, Auth, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword, Places } from './routes-config';
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     path: "/",
     element: <RootLayout />,
@@ -66,6 +66,8 @@ const router = createBrowserRouter([
       { path: "places", element: <Places /> },
     ],
   },
-]);
+];
+
+const router = createBrowserRouter(routes);
 
 export default router;
