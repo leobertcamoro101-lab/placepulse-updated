@@ -58,6 +58,51 @@ describe("GET /api/users", () => {
     expect(res.body.users[0].email).toBe("second@example.com");
     expect(res.body.users[1].email).toBe("first@example.com");
   });
+
+  it("returns pagination metadata alongside the users", async () => {
+  await signupAndLogin("pag1@example.com");
+  await signupAndLogin("pag2@example.com");
+
+  const res = await request(app).get("/api/users");
+
+  expect(res.status).toBe(200);
+  expect(res.body.pagination).toEqual({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 2,
+    hasMore: false,
+  });
+});
+
+it("respects the limit query param and reports hasMore correctly", async () => {
+  await signupAndLogin("lim1@example.com");
+  await signupAndLogin("lim2@example.com");
+  await signupAndLogin("lim3@example.com");
+
+  const res = await request(app).get("/api/users?limit=2");
+
+  expect(res.status).toBe(200);
+  expect(res.body.users).toHaveLength(2);
+  expect(res.body.pagination).toEqual({
+    currentPage: 1,
+    totalPages: 2,
+    totalCount: 3,
+    hasMore: true,
+  });
+});
+
+it("returns the second page correctly", async () => {
+  await signupAndLogin("page1@example.com");
+  await signupAndLogin("page2@example.com");
+  await signupAndLogin("page3@example.com");
+
+  const res = await request(app).get("/api/users?page=2&limit=2");
+
+  expect(res.status).toBe(200);
+  expect(res.body.users).toHaveLength(1); // 3 total, 2 on page 1, 1 remaining
+  expect(res.body.pagination.currentPage).toBe(2);
+  expect(res.body.pagination.hasMore).toBe(false);
+});
 });
 
 describe("GET /api/users/:uid", () => {

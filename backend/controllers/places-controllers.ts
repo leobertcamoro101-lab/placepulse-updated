@@ -188,19 +188,43 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
 };
 
 const getAllPlaces = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+  const skip = (page - 1) * limit;
+
   let places;
+  let totalCount;
   try {
-    places = await Place.find({}).populate("creator", "firstName lastName image").sort({ createdAt: -1 });
+    [places, totalCount] = await Promise.all([
+      Place.find({})
+        .populate("creator", "firstName lastName image")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Place.countDocuments({}),
+    ]);
   } catch (err) {
     return res.status(500).json({ message: "Fetching places failed, please try again later." });
   }
 
-  if (!places || places.length === 0) {
+  // Only 404 when the collection is genuinely empty — a page number past
+  // the last page of real data should return an empty array with valid
+  // pagination metadata, not be mistaken for "nothing exists at all".
+  if (totalCount === 0) {
     return res.status(404).json({ message: "No places found." });
   }
 
-  res.json({ places: places.map((place) => place.toObject({ getters: true })) });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+    pagination: {
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      hasMore: skip + places.length < totalCount,
+    },
+  });
 };
+
 
 export {
   getPlaceById,

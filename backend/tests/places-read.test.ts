@@ -66,6 +66,50 @@ describe("GET /api/places", () => {
     expect(res.body.places).toHaveLength(2);
     expect(res.body.places[0].creator.firstName).toBe("Test");
   });
+  it("returns pagination metadata alongside the places", async () => {
+  const { token } = await signupAndLogin("pagination@example.com");
+  await createPlace(token, "Central Park");
+  await createPlace(token, "Golden Gate Park");
+
+  const res = await request(app).get("/api/places");
+
+  expect(res.status).toBe(200);
+  expect(res.body.pagination).toEqual({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 2,
+    hasMore: false,
+  });
+});
+
+it("respects the limit query param and reports hasMore correctly", async () => {
+  const { token } = await signupAndLogin("limited@example.com");
+  await createPlace(token, "Central Park");
+  await createPlace(token, "Golden Gate Park");
+  await createPlace(token, "Hyde Park");
+
+  const res = await request(app).get("/api/places?limit=2");
+
+  expect(res.status).toBe(200);
+  expect(res.body.places).toHaveLength(2);
+  expect(res.body.pagination).toEqual({
+    currentPage: 1,
+    totalPages: 2,
+    totalCount: 3,
+    hasMore: true,
+  });
+});
+
+it("returns an empty array (not a 404) for a page past the last one when data exists", async () => {
+  const { token } = await signupAndLogin("pastpage@example.com");
+  await createPlace(token, "Central Park");
+
+  const res = await request(app).get("/api/places?page=5&limit=10");
+
+  expect(res.status).toBe(200);
+  expect(res.body.places).toEqual([]);
+  expect(res.body.pagination.totalCount).toBe(1);
+});
 });
 
 describe("GET /api/places/:pid", () => {

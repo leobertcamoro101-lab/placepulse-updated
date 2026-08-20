@@ -10,14 +10,34 @@ import User from "../models/user";
 import { AuthRequest } from "../middleware/check-auth";
 
 const getUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+  const skip = (page - 1) * limit;
+
   let users;
+  let totalCount;
   try {
-    users = await User.find({}, "-password -resetPasswordToken -resetPasswordExpires").sort({ createdAt: -1 }); // exclude the password, resetPasswordToken, resetPasswordExpires
+    [users, totalCount] = await Promise.all([
+      User.find({}, "-password -resetPasswordToken -resetPasswordExpires")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments({}),
+    ]);
   } catch (err) {
     const error = new HttpError("Fetching users failed, please try again later", 500);
     return next(error);
   }
-  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
+
+  res.json({
+    users: users.map((user) => user.toObject({ getters: true })),
+    pagination: {
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      hasMore: skip + users.length < totalCount,
+    },
+  });
 };
 
 const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) => {
