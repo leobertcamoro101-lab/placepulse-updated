@@ -14,9 +14,11 @@ import mongoose from "mongoose";
 const E2E_DB_NAME = "playwright_e2e";
 
 const run = async (): Promise<void> => {
-  await mongoose.connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.accdk79.mongodb.net/${E2E_DB_NAME}?appName=Cluster0`
-  );
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI is not set — check your .env file.");
+  }
+
+  await mongoose.connect(process.env.MONGO_URI, { dbName: E2E_DB_NAME });
 
   console.log("DB_NAME:", E2E_DB_NAME);
 

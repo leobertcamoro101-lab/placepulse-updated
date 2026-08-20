@@ -1,6 +1,6 @@
 import "node:dns/promises";
 import dns from "node:dns/promises";
-dns.setServers(["1.1.1.1", "8.8.8.8"]); // << if error connection do this
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -18,11 +18,12 @@ const extractPublicId = (url?: string | null): string | null => {
 };
 
 const run = async (): Promise<void> => {
-  await mongoose.connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.accdk79.mongodb.net/${process.env.DB_NAME}?appName=Cluster0`
-  );
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI is not set — check your .env file.");
+  }
 
-  console.log("DB_USER:", process.env.DB_USER);
+  await mongoose.connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME });
+
   console.log("DB_NAME:", process.env.DB_NAME);
 
   const places = await Place.find({}, "image");

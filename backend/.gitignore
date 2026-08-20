@@ -14,3 +14,8 @@ npx vitest run --coverage
 npx ts-node scripts/cleanup-e2e-data.ts 
 npx ts-node scripts/cleanup-orphaned-images.ts
  
+kill it e2e error
+netstat -ano | findstr :5000
+taskkill /PID 40424 /F /T
+remove commented variable
+

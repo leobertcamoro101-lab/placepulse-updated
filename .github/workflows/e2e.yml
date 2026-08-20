@@ -18,8 +18,7 @@ jobs:
     name: Playwright E2E
     runs-on: ubuntu-latest
     env:
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      MONGO_URI: ${{ secrets.MONGO_URI }}
       DB_NAME: playwright_e2e
       JWT_KEY: ${{ secrets.JWT_KEY }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}

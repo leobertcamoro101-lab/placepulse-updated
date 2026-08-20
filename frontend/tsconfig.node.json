@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true, // okay to delete
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",

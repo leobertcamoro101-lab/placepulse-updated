@@ -7,21 +7,17 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]); // << if error connection do this
 
 const PORT = process.env.PORT || 5000;
 
-// commented because of playwright
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-//for playwright
-app.listen(Number(PORT), "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+if (!process.env.MONGO_URI) {
+  throw new Error("MONGO_URI is not set — check your .env file.");
+}
+
 mongoose
-  .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.accdk79.mongodb.net/${process.env.DB_NAME}?appName=Cluster0`
-  )
-  .then(() => console.log("MongoDB connected"))
+  .connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME })
+  .then(() => console.log(`MongoDB connected (db: ${process.env.DB_NAME})`))
   .catch((err: unknown) => {
     console.log(err);
   });

@@ -17,11 +17,16 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
-  // Starts both servers automatically before the test run, and reuses
-  // them if you already have `npm run dev` running locally in each folder.
-  // Using 127.0.0.1 instead of localhost avoids a Windows IPv6/IPv4
-  // resolution mismatch where the health check hits ::1 but the dev
-  // servers only bind to the IPv4 loopback address.
+  // Always spawn fresh servers, both locally and in CI — never reuse an
+  // already-running one. This is deliberate: reusing an existing backend
+  // skips the DB_NAME env override below entirely (whatever database that
+  // existing process happened to be connected to just stays in use), which
+  // is exactly the kind of silent mismatch the global-setup guardrail
+  // exists to catch. Always spawning fresh means there's never ambiguity
+  // about which backend — or which database — a test run is actually using.
+  // If port 5000/5173 is already occupied, Playwright now fails loudly
+  // with a clear "port in use" error instead of silently reusing whatever
+  // was there.
   webServer: [
     {
       command: "npm run dev",
@@ -32,7 +37,7 @@ export default defineConfig({
       // something is listening, which is all we actually need.
       port: 5000,
       timeout: 120000,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       // Overrides DB_NAME for this spawned process only — dotenv never
       // overwrites a variable that's already set in the environment, so
       // this wins over whatever DB_NAME your backend/.env has, without
@@ -46,7 +51,7 @@ export default defineConfig({
       cwd: "../frontend",
       url: "http://127.0.0.1:5173",
       timeout: 120000,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
     },
   ],
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
