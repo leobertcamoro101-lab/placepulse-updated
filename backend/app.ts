@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import mongoose from "mongoose";
+import logger from "./util/logger";
 
 import placesRoutes from "./routes/places-routes";
 import usersRoutes from "./routes/users-routes";
@@ -66,6 +67,19 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     return next(error);
   }
 
+  const status = error.code || 500;
+
+  // Log every server-side error with useful request context. Client
+  // errors (4xx — bad input, auth failures, not found) are expected,
+  // routine traffic and not logged as errors to avoid noise; anything
+  // 5xx means something actually went wrong and is worth seeing.
+  if (status >= 500) {
+    logger.error(
+      { err: error, method: req.method, path: req.path, status },
+      "Request failed"
+    );
+  }
+
   if (error.name === "MulterError") {
     let message = "File upload error.";
     if (error.code === "LIMIT_FILE_SIZE") {
@@ -74,7 +88,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     return res.status(422).json({ message });
   }
 
-  res.status(error.code || 500);
+  res.status(status);
   res.json({ message: error.message || "An unknown error occurred" });
 });
 

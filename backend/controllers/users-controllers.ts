@@ -6,6 +6,7 @@ import crypto from "crypto";
 import sendResetPasswordEmail from "../util/brevo-email";
 import { deleteCloudinaryImage, extractPublicId } from "../util/cloudinary-cleanup";
 import HttpError from "../models/http-error";
+import logger from "../util/logger";
 import User from "../models/user";
 import { AuthRequest } from "../middleware/check-auth";
 
@@ -106,7 +107,8 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
     await createdUser.save();
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "signup failed");
     return next(new HttpError("Signing up failed, please try again.", 500));
   }
 
@@ -118,7 +120,8 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "signup failed");
     return next(new HttpError("Signing up failed, please try again.", 500));
   }
 
@@ -165,7 +168,8 @@ const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "login failed");
     return next(new HttpError("Logging in failed, please try again.", 500));
   }
 
@@ -204,7 +208,8 @@ const forgotPassword = async (req: AuthRequest, res: Response, next: NextFunctio
     await existingUser.save();
     await sendResetPasswordEmail(existingUser.email, rawToken);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "forgotPassword failed");
     return next(new HttpError("Could not send reset email, please try again.", 500));
   }
 

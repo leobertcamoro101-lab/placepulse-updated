@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import mongoose from "mongoose";
 
 import HttpError from "../models/http-error";
+import logger from "../util/logger";
 import getCoordsForAddress from "../util/location";
 import { deleteCloudinaryImage, extractPublicId } from "../util/cloudinary-cleanup";
 import Place from "../models/place";
@@ -103,7 +104,8 @@ const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await sess.commitTransaction();
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "createPlace failed");
     return next(new HttpError("Creating place failed, please try again.", 500));
   }
 
@@ -122,7 +124,8 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "updatePlace failed");
     return next(new HttpError("Something went wrong, could not update place", 500));
   }
 
@@ -141,7 +144,8 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     await place.save();
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "updatePlace failed");
     return next(new HttpError("Something went wrong, could not update place.", 500));
   }
 
@@ -155,7 +159,8 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId).populate("creator"); //set a connection or relation to use the method populate() if not it wont work;
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "deletePlace failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
   
@@ -179,7 +184,8 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await creator.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
-    console.log(err);
+    // console.log(err);
+    logger.error({ err }, "deletePlace failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
 
