@@ -35,7 +35,7 @@ function PlaceList({ items, onDeletePlace }: PlaceListProps) {
     return (
       <div className="flex justify-center items-center min-h-[50vh] w-full px-4">
         <Card className="text-center p-6 max-w-md w-full">
-          <h2 className="text-lg text-gray-800 mb-4">No places found. Maybe create one?</h2>
+          <h2 className="text-lg text-gray-800 mb-4">No places found. Maybe create one.</h2>
           <Button
             to="/places/new"
             className="rounded-full bg-blue-600 hover:bg-blue-700 border-blue-600 text-white font-semibold px-6 py-3"
