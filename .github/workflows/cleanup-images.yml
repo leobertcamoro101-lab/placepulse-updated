@@ -24,8 +24,8 @@ jobs:
       # nothing) since this runs unattended against real production data.
       # Once you've checked a couple of scheduled runs' logs in the
       # Actions tab and confirmed the orphan list looks correct, change
-      # this to "false" to allow real deletions.
-      DRY_RUN: "true"
+      # this to "false" to allow real deletions "true" to not allow deletions.
+      DRY_RUN: "false"
 
     steps:
       - name: Checkout code
