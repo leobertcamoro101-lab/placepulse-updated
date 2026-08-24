@@ -22,9 +22,16 @@ const run = async (): Promise<void> => {
     throw new Error("MONGO_URI is not set — check your .env file.");
   }
 
+  // Defaults to true (safe) — must be explicitly set to "false" to allow
+  // real deletions. Meant for automated/scheduled runs where nobody is
+  // watching in real time; log the results first, confirm they look
+  // correct, then flip this off.
+  const isDryRun = process.env.DRY_RUN !== "false";
+
   await mongoose.connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME });
 
   console.log("DB_NAME:", process.env.DB_NAME);
+  console.log("DRY_RUN:", isDryRun);
 
   const places = await Place.find({}, "image");
   const users = await User.find({}, "image");
@@ -56,9 +63,12 @@ const run = async (): Promise<void> => {
 
     for (const resource of result.resources) {
       if (!usedPublicIds.has(resource.public_id)) {
-        console.log("Orphan found, deleting:", resource.public_id);
-        await cloudinary.uploader.destroy(resource.public_id); // to delete
-        // console.log('WOULD DELETE:', resource.public_id); // dry-run mode
+        if (isDryRun) {
+          console.log("WOULD DELETE (dry run):", resource.public_id);
+        } else {
+          console.log("Orphan found, deleting:", resource.public_id);
+          await cloudinary.uploader.destroy(resource.public_id);
+        }
         orphanCount++;
       }
     }
@@ -66,7 +76,11 @@ const run = async (): Promise<void> => {
     nextCursor = result.next_cursor;
   } while (nextCursor);
 
-  console.log(`Done. Deleted ${orphanCount} orphaned image(s).`);
+  console.log(
+    isDryRun
+      ? `Done. ${orphanCount} orphaned image(s) found (dry run — nothing deleted).`
+      : `Done. Deleted ${orphanCount} orphaned image(s).`
+  );
   await mongoose.disconnect();
 };
 

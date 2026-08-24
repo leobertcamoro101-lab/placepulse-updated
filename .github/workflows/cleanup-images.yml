@@ -1,0 +1,45 @@
+name: Weekly Orphaned Image Cleanup
+
+on:
+  schedule:
+    # Every Sunday at 3:00 AM UTC
+    - cron: "0 3 * * 0"
+  # Lets you trigger it manually from the Actions tab too, useful for
+  # testing without waiting for the schedule.
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Clean up orphaned Cloudinary images
+    runs-on: ubuntu-latest
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      # Real production database — NOT the E2E one. Double-check this
+      # matches your actual production DB_NAME before the first run.
+      DB_NAME: placepulse_updated
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      # Starts in dry-run mode (logs what WOULD be deleted, deletes
+      # nothing) since this runs unattended against real production data.
+      # Once you've checked a couple of scheduled runs' logs in the
+      # Actions tab and confirmed the orphan list looks correct, change
+      # this to "false" to allow real deletions.
+      DRY_RUN: "true"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run cleanup script
+        working-directory: backend
+        run: npx ts-node scripts/cleanup-orphaned-images.ts
