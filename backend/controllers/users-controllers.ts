@@ -107,8 +107,7 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
     await createdUser.save();
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
-    // console.log(err);
-    logger.error({ err }, "signup failed");
+    logger.error({ err }, "Signup Failed");
     return next(new HttpError("Signing up failed, please try again.", 500));
   }
 
@@ -120,10 +119,11 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "signup failed");
+   
+    logger.error({ err }, "Signup Failed");
     return next(new HttpError("Signing up failed, please try again.", 500));
   }
+  logger.info({ userId: createdUser.id, email: createdUser.email }, "User signed up");
 
   res.status(201).json({
     userId: createdUser.id,
@@ -133,6 +133,7 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
     token,
     // name: createdUser.firstName + ' ' + createdUser.lastName,
   });
+  
 };
 
 const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -168,10 +169,11 @@ const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "login failed");
+   
+    logger.error({ err }, "Login Failed");
     return next(new HttpError("Logging in failed, please try again.", 500));
   }
+   logger.info({ userId: existingUser.id, email: existingUser.email }, "User logged in");
 
   res.json({
     userId: existingUser.id,
@@ -208,11 +210,12 @@ const forgotPassword = async (req: AuthRequest, res: Response, next: NextFunctio
     await existingUser.save();
     await sendResetPasswordEmail(existingUser.email, rawToken);
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "forgotPassword failed");
+    
+    logger.error({ err }, "Forgot Password failed");
     return next(new HttpError("Could not send reset email, please try again.", 500));
   }
 
+  logger.info({ userId: existingUser.id, email: existingUser.email }, "Password reset requested");
   res.json({ message: "If that email exists, a reset link has been sent." });
 };
 
@@ -252,6 +255,7 @@ const resetPassword = async (req: AuthRequest, res: Response, next: NextFunction
     return next(new HttpError("Could not reset password, please try again.", 500));
   }
 
+  logger.info({ userId: existingUser.id }, "Password reset completed");
   res.json({ message: "Password has been reset successfully." });
 };
 
@@ -312,6 +316,7 @@ const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction
   try {
     await user.save();
   } catch (err) {
+    logger.error({ err }, "Update Profile failed");
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
     return next(new HttpError("Updating profile failed, please try again.", 500));
   }
@@ -367,6 +372,7 @@ const changePassword = async (req: AuthRequest, res: Response, next: NextFunctio
   try {
     await user.save();
   } catch (err) {
+    logger.error({ err }, "Change Password failed");
     return next(new HttpError("Could not update password, please try again.", 500));
   }
 

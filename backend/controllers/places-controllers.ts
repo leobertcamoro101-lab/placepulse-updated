@@ -104,11 +104,14 @@ const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await sess.commitTransaction();
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
-    // console.log(err);
+    
     logger.error({ err }, "createPlace failed");
     return next(new HttpError("Creating place failed, please try again.", 500));
   }
-
+  logger.info(
+    { placeId: createdPlace.id, userId: req.userData!.userId },
+    "Place created"
+  );
   res.status(201).json({ place: createdPlace });
 };
 
@@ -124,8 +127,8 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId);
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "updatePlace failed");
+    
+    logger.error({ err }, "Update Place failed");
     return next(new HttpError("Something went wrong, could not update place", 500));
   }
 
@@ -144,8 +147,8 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     await place.save();
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "updatePlace failed");
+  
+    logger.error({ err }, "Update Place failed");
     return next(new HttpError("Something went wrong, could not update place.", 500));
   }
 
@@ -159,8 +162,8 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId).populate("creator"); //set a connection or relation to use the method populate() if not it wont work;
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "deletePlace failed");
+    
+    logger.error({ err }, "Delete Place failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
   
@@ -184,12 +187,15 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await creator.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
-    // console.log(err);
-    logger.error({ err }, "deletePlace failed");
+    
+    logger.error({ err }, "Delete Place failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
 
   await deleteCloudinaryImage(extractPublicId(imageUrl));
+
+  logger.info({ placeId, userId: req.userData!.userId }, "Place deleted");
+
   res.status(200).json({ message: "Deleted place" });
 };
 

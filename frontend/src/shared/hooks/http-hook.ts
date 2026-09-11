@@ -1,6 +1,7 @@
 //wired with LaodingContext for combined loading State
 import { useState, useCallback, useRef, useEffect, useContext } from "react";
 import { LoadingContext } from "../context/loading-context";
+import { logger } from "../utils/logger";
 
 interface HttpError {
   message: string;
@@ -51,6 +52,7 @@ export const useHttpClient = () => {
           return;
         }
         const message = err instanceof Error ? err.message : "Something went wrong.";
+        logger.error("Request failed", { url, method, message });
         setError(message);
         setIsLoading(false);
         throw err;

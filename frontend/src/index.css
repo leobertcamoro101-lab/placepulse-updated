@@ -1,16 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+@theme {
+  --font-sans: 'Open Sans', sans-serif;
 }
 
 html {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-sans);
 }
 
 body {
-  margin: 0;
   background: #F2F4F7;
 }
 

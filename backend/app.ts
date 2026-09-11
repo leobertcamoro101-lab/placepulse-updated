@@ -5,6 +5,7 @@ import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import mongoose from "mongoose";
 import logger from "./util/logger";
+import pinoHttp from "pino-http";
 
 import placesRoutes from "./routes/places-routes";
 import usersRoutes from "./routes/users-routes";
@@ -13,6 +14,19 @@ import HttpError from "./models/http-error";
 const app = express();
 
 app.use(helmet());
+app.use(
+  pinoHttp({ 
+    logger,
+    redact: {
+      paths: ["req.headers.authorization", "req.headers.cookie"],
+      remove: true,
+    },
+    serializers: {
+      req: (req) => ({ method: req.method, url: req.url }),
+      res: (res) => ({ statusCode: res.statusCode }),
+    }, 
+  })
+);
 app.use(bodyParser.json());
 
 // app.use(mongoSanitize()); // commented and change compatibility issue express 5.x.x version
