@@ -7,7 +7,10 @@ interface Coordinates {
 }
 
 async function getCoordsForAddress(address: string): Promise<Coordinates> {
-  const response = await axios.get(
+  
+  let response;
+  try {
+    response = await axios.get(
     `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`,
     {
       headers: {
@@ -15,6 +18,12 @@ async function getCoordsForAddress(address: string): Promise<Coordinates> {
       },
     }
   );
+  } catch (err) {
+    // Network failure, timeout, or Nominatim itself being down — not the
+    // user's fault, unlike "address not found" below, so this is a genuine
+    // upstream/service failure and gets a proper numeric HttpError code.
+    throw new HttpError("Could not verify address, please try again later.", 503);
+  }
 
   const data = response.data;
 

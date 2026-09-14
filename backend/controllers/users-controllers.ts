@@ -26,6 +26,7 @@ const getUsers = async (req: AuthRequest, res: Response, next: NextFunction) => 
       User.countDocuments({}),
     ]);
   } catch (err) {
+    logger.error({ err }, "Get users failed");
     const error = new HttpError("Fetching users failed, please try again later", 500);
     return next(error);
   }
@@ -48,6 +49,7 @@ const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     user = await User.findById(userId, "-password -resetPasswordToken -resetPasswordExpires"); // exclude the password, resetPasswordToken, resetPasswordExpires
   } catch (err) {
+    logger.error({ err }, "Get user failed");
     return next(new HttpError("Fetching user failed, please try again later", 500));
   }
 
@@ -76,6 +78,7 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
     existingUser = await User.findOne({ email });
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
+    logger.error({ err }, "Signup failed");
     return next(new HttpError("Signing up failed, please try again later.", 500));
   }
 
@@ -89,6 +92,7 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
     hashedPassword = await bcrypt.hash(password, 12);
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
+    logger.error({ err }, "Signup failed");
     return next(new HttpError("Could not create user, please try again", 500));
   }
 
@@ -119,7 +123,6 @@ const signup = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-   
     logger.error({ err }, "Signup Failed");
     return next(new HttpError("Signing up failed, please try again.", 500));
   }
@@ -143,6 +146,7 @@ const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     existingUser = await User.findOne({ email });
   } catch (err) {
+    logger.error({ err }, "Login failed");
     return next(new HttpError("Logging in failed, please try again later.", 500));
   }
 
@@ -154,6 +158,7 @@ const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     isValidPassword = await bcrypt.compare(password, existingUser.password);
   } catch (err) {
+    logger.error({ err }, "Login failed");
     return next(new HttpError("Could not log you in please check credentials and try again", 500));
   }
 
@@ -169,7 +174,6 @@ const login = async (req: AuthRequest, res: Response, next: NextFunction) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-   
     logger.error({ err }, "Login Failed");
     return next(new HttpError("Logging in failed, please try again.", 500));
   }
@@ -191,6 +195,7 @@ const forgotPassword = async (req: AuthRequest, res: Response, next: NextFunctio
   try {
     existingUser = await User.findOne({ email });
   } catch (err) {
+    logger.error({ err }, "Forgot password failed");
     return next(new HttpError("Something went wrong, please try again later.", 500));
   }
 
@@ -210,7 +215,6 @@ const forgotPassword = async (req: AuthRequest, res: Response, next: NextFunctio
     await existingUser.save();
     await sendResetPasswordEmail(existingUser.email, rawToken);
   } catch (err) {
-    
     logger.error({ err }, "Forgot Password failed");
     return next(new HttpError("Could not send reset email, please try again.", 500));
   }
@@ -231,6 +235,7 @@ const resetPassword = async (req: AuthRequest, res: Response, next: NextFunction
       resetPasswordExpires: { $gt: Date.now() },
     });
   } catch (err) {
+    logger.error({ err }, "Reset password failed");
     return next(new HttpError("Something went wrong, please try again later.", 500));
   }
 
@@ -242,6 +247,7 @@ const resetPassword = async (req: AuthRequest, res: Response, next: NextFunction
   try {
     hashedPassword = await bcrypt.hash(password, 12);
   } catch (err) {
+    logger.error({ err }, "Reset password failed");
     return next(new HttpError("Could not reset password, please try again.", 500));
   }
 
@@ -254,7 +260,6 @@ const resetPassword = async (req: AuthRequest, res: Response, next: NextFunction
   } catch (err) {
     return next(new HttpError("Could not reset password, please try again.", 500));
   }
-
   logger.info({ userId: existingUser.id }, "Password reset completed");
   res.json({ message: "Password has been reset successfully." });
 };
@@ -280,6 +285,7 @@ const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction
     user = await User.findById(userId);
   } catch (err) {
     await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+    logger.error({ err }, "Update profile failed");
     return next(new HttpError("Something went wrong, could not update profile.", 500));
   }
 
@@ -294,6 +300,7 @@ const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction
       existingEmailUser = await User.findOne({ email });
     } catch (err) {
       await deleteCloudinaryImage(req.file?.cloudinaryPublicId);
+      logger.error({ err }, "Update profile failed");
       return next(new HttpError("Something went wrong, could not update profile.", 500));
     }
     if (existingEmailUser) {
@@ -324,7 +331,7 @@ const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction
   if (oldImagePublicId) {
     await deleteCloudinaryImage(oldImagePublicId);
   }
-
+  logger.info({ userId: user.id }, "Profile updated");
   res.json({ user: user.toObject({ getters: true }) });
 };
 
@@ -342,6 +349,7 @@ const changePassword = async (req: AuthRequest, res: Response, next: NextFunctio
   try {
     user = await User.findById(userId);
   } catch (err) {
+    logger.error({ err }, "Change password failed");
     return next(new HttpError("Something went wrong, please try again.", 500));
   }
 
@@ -353,6 +361,7 @@ const changePassword = async (req: AuthRequest, res: Response, next: NextFunctio
   try {
     isValidPassword = await bcrypt.compare(currentPassword, user.password);
   } catch (err) {
+    logger.error({ err }, "Change password failed");
     return next(new HttpError("Could not verify password, please try again.", 500));
   }
 
@@ -364,6 +373,7 @@ const changePassword = async (req: AuthRequest, res: Response, next: NextFunctio
   try {
     hashedPassword = await bcrypt.hash(newPassword, 12);
   } catch (err) {
+    logger.error({ err }, "Change password failed");
     return next(new HttpError("Could not update password, please try again.", 500));
   }
 
@@ -375,7 +385,7 @@ const changePassword = async (req: AuthRequest, res: Response, next: NextFunctio
     logger.error({ err }, "Change Password failed");
     return next(new HttpError("Could not update password, please try again.", 500));
   }
-
+  logger.info({ userId: user.id }, "Password changed");
   res.json({ message: "Password updated successfully." });
 };
 

@@ -16,6 +16,7 @@ const getPlaceById = async (req: AuthRequest, res: Response, next: NextFunction)
   try {
     place = await Place.findById(placeId);
   } catch (err) {
+    logger.error({ err }, "Get place failed");
     return next(new HttpError("Something went wrong. could not find a place", 500));
   }
 
@@ -35,6 +36,7 @@ const getPlacesByUserId = async (req: AuthRequest, res: Response, next: NextFunc
       options: { sort: { createdAt: -1 } },
     });
   } catch (err) {
+    logger.error({ err }, "Get places by user failed");
     return next(new HttpError("Fetching places failed, please try again later", 500));
   }
 
@@ -87,6 +89,7 @@ const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     user = await User.findById(req.userData!.userId); // "creator" changed
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
+    logger.error({ err }, "Create place failed");
     return next(new HttpError("Creating place failed, please try again", 500));
   }
 
@@ -104,7 +107,6 @@ const createPlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await sess.commitTransaction();
   } catch (err) {
     await deleteCloudinaryImage(req.file.cloudinaryPublicId);
-    
     logger.error({ err }, "createPlace failed");
     return next(new HttpError("Creating place failed, please try again.", 500));
   }
@@ -127,7 +129,6 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId);
   } catch (err) {
-    
     logger.error({ err }, "Update Place failed");
     return next(new HttpError("Something went wrong, could not update place", 500));
   }
@@ -147,7 +148,6 @@ const updatePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     await place.save();
   } catch (err) {
-  
     logger.error({ err }, "Update Place failed");
     return next(new HttpError("Something went wrong, could not update place.", 500));
   }
@@ -162,7 +162,6 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
   try {
     place = await Place.findById(placeId).populate("creator"); //set a connection or relation to use the method populate() if not it wont work;
   } catch (err) {
-    
     logger.error({ err }, "Delete Place failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
@@ -187,7 +186,6 @@ const deletePlace = async (req: AuthRequest, res: Response, next: NextFunction) 
     await creator.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
-    
     logger.error({ err }, "Delete Place failed");
     return next(new HttpError("Something went wrong, could not delete place", 500));
   }
@@ -216,6 +214,7 @@ const getAllPlaces = async (req: AuthRequest, res: Response, next: NextFunction)
       Place.countDocuments({}),
     ]);
   } catch (err) {
+    logger.error({ err }, "Get all places failed");
     return res.status(500).json({ message: "Fetching places failed, please try again later." });
   }
 
