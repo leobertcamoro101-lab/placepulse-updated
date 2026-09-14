@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PlacePulse — All Places</title>
+</head>
+<body>
+  <h1>All Places</h1>
+  <ul>
+    <% places.forEach(function(place) { %>
+      <li>
+        <strong><%= place.title %></strong> — <%= place.address %>
+      </li>
+    <% }); %>
+  </ul>
+</body>
+</html>

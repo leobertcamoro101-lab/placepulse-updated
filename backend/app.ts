@@ -6,12 +6,16 @@ import mongoSanitize from "express-mongo-sanitize";
 import mongoose from "mongoose";
 import logger from "./util/logger";
 import pinoHttp from "pino-http";
+import path from "path";
 
+import { renderPlacesPage } from "./controllers/views-controllers";
 import placesRoutes from "./routes/places-routes";
 import usersRoutes from "./routes/users-routes";
 import HttpError from "./models/http-error";
 
 const app = express();
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
 app.use(helmet());
 app.use(
@@ -66,6 +70,7 @@ app.get("/health", (req: Request, res: Response) => {
   res.json({ dbName: mongoose.connection.name || null });
 });
 
+app.get("/views/places", renderPlacesPage);
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
