@@ -15,10 +15,9 @@ frontend/skills-lock.json
 backend/node_modules
 backend/.env
 backend/nodemon.json
-backend/uploads/images
 
 
-playwright
+# playwright
 cd e2e
 npx playwright test --ui
 npx playwright test

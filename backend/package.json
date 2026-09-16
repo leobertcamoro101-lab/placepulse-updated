@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc && node scripts/copy-views.js",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only server.ts | pino-pretty",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts | pino-pretty",
     "test": "vitest run",
     "cleanup:cloudinary": "ts-node scripts/cleanup-orphaned-images.ts ",
     "cleanup:e2e": "ts-node scripts/cleanup-e2e-data.ts"

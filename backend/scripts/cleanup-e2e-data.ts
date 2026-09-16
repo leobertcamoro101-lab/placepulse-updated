@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import mongoose from "mongoose";
-import { deleteCloudinaryImage, extractPublicId } from "../util/cloudinary-cleanup";
+import { deleteCloudinaryImage, extractPublicId } from "../src/util/cloudinary-cleanup";
 
 // This script has exactly one job — cleaning the dedicated E2E database —
 // so the name is hardcoded here rather than read from .env. This means

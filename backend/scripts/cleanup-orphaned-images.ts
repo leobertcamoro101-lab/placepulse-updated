@@ -6,9 +6,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import mongoose from "mongoose";
-import cloudinary from "../config/cloudinary";
-import Place from "../models/place";
-import User from "../models/user";
+import cloudinary from "../src/config/cloudinary";
+import Place from "../src/models/place";
+import User from "../src/models/user";
 
 const extractPublicId = (url?: string | null): string | null => {
   if (!url) return null;
