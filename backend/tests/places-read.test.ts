@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
-import app from "../app";
+import app from "../src/app";
 
-vi.mock("../middleware/file-upload", () => ({
+vi.mock("../src/middleware/file-upload.ts", () => ({
   upload: {
     single: () => (req: any, res: any, next: any) => next(),
   },
@@ -16,12 +16,12 @@ vi.mock("../middleware/file-upload", () => ({
   },
 }));
 
-vi.mock("../util/cloudinary-cleanup", () => ({
+vi.mock("../src/util/cloudinary-cleanup.ts", () => ({
   deleteCloudinaryImage: vi.fn().mockResolvedValue(undefined),
   extractPublicId: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock("../util/location", () => ({
+vi.mock("../src/util/location.ts", () => ({
   default: vi.fn().mockResolvedValue({ lat: 40.748817, lng: -73.985428 }),
 }));
 

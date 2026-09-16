@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import app from "../app";
-import sendResetPasswordEmail from "../util/brevo-email";
+import app from "../src/app";
+import sendResetPasswordEmail from "../src/util/brevo-email";
 
 // Don't send real emails in tests — capture the (email, rawToken) args instead
 // so tests can drive the full forgot -> reset -> login round trip.
-vi.mock("../util/brevo-email", () => ({
+vi.mock("../src/util/brevo-email.ts", () => ({
   default: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Signup needs the multer/Cloudinary upload middleware — same bypass used
 // in users-auth.test.ts.
-vi.mock("../middleware/file-upload", () => ({
+vi.mock("../src/middleware/file-upload.ts", () => ({
   upload: {
     single: () => (req: any, res: any, next: any) => next(),
   },
@@ -25,7 +25,7 @@ vi.mock("../middleware/file-upload", () => ({
   },
 }));
 
-vi.mock("../util/cloudinary-cleanup", () => ({
+vi.mock("../src/util/cloudinary-cleanup.ts", () => ({
   deleteCloudinaryImage: vi.fn().mockResolvedValue(undefined),
   extractPublicId: vi.fn().mockReturnValue(null),
 }));

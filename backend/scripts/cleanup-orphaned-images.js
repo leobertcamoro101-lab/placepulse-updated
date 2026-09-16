@@ -1,0 +1,77 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+require("node:dns/promises");
+const promises_1 = __importDefault(require("node:dns/promises"));
+promises_1.default.setServers(["1.1.1.1", "8.8.8.8"]);
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const mongoose_1 = __importDefault(require("mongoose"));
+const cloudinary_1 = __importDefault(require("../src/config/cloudinary"));
+const place_1 = __importDefault(require("../src/models/place"));
+const user_1 = __importDefault(require("../src/models/user"));
+const extractPublicId = (url) => {
+    if (!url)
+        return null;
+    // e.g. https://res.cloudinary.com/xxx/image/upload/v123/placepulse-updated/abc123.jpg
+    const match = url.match(/placepulse-updated\/([^/.]+)/);
+    return match ? `placepulse-updated/${match[1]}` : null;
+};
+const run = async () => {
+    if (!process.env.MONGO_URI) {
+        throw new Error("MONGO_URI is not set — check your .env file.");
+    }
+    // Defaults to true (safe) — must be explicitly set to "false" to allow
+    // real deletions. Meant for automated/scheduled runs where nobody is
+    // watching in real time; log the results first, confirm they look
+    // correct, then flip this off.
+    const isDryRun = process.env.DRY_RUN !== "false";
+    await mongoose_1.default.connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME });
+    console.log("DB_NAME:", process.env.DB_NAME);
+    console.log("DRY_RUN:", isDryRun);
+    const places = await place_1.default.find({}, "image");
+    const users = await user_1.default.find({}, "image");
+    console.log("Places found:", places.length);
+    console.log("Users found:", users.length);
+    console.log("Place images:", places.map((p) => p.image));
+    console.log("User images:", users.map((u) => u.image));
+    const usedPublicIds = new Set([...places, ...users]
+        .map((doc) => extractPublicId(doc.image))
+        .filter((id) => Boolean(id)));
+    console.log("Used public IDs:", [...usedPublicIds]);
+    console.log(`Found ${usedPublicIds.size} images referenced in the database.`);
+    let nextCursor = undefined;
+    let orphanCount = 0;
+    do {
+        const result = await cloudinary_1.default.api.resources({
+            type: "upload",
+            prefix: "placepulse-updated/",
+            max_results: 100,
+            next_cursor: nextCursor,
+        });
+        for (const resource of result.resources) {
+            if (!usedPublicIds.has(resource.public_id)) {
+                if (isDryRun) {
+                    console.log("WOULD DELETE (dry run):", resource.public_id);
+                }
+                else {
+                    console.log("Orphan found, deleting:", resource.public_id);
+                    await cloudinary_1.default.uploader.destroy(resource.public_id);
+                }
+                orphanCount++;
+            }
+        }
+        nextCursor = result.next_cursor;
+    } while (nextCursor);
+    console.log(isDryRun
+        ? `Done. ${orphanCount} orphaned image(s) found (dry run — nothing deleted).`
+        : `Done. Deleted ${orphanCount} orphaned image(s).`);
+    await mongoose_1.default.disconnect();
+};
+run().catch((err) => {
+    console.error(err);
+    process.exit(1);
+});
+//# sourceMappingURL=cleanup-orphaned-images.js.map

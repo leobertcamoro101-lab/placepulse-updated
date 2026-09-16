@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
-import app from "../app";
+import app from "../src/app";
 
 // Bypass real Multer/Cloudinary upload in tests — signup just needs *a* req.file
 // with the fields the controller reads, not a real uploaded image.
-vi.mock("../middleware/file-upload", () => ({
+vi.mock("../src/middleware/file-upload.ts", () => ({
   upload: {
     single: () => (req: any, res: any, next: any) => next(),
   },
@@ -19,7 +19,7 @@ vi.mock("../middleware/file-upload", () => ({
 }));
 
 // No-op cleanup so failed-path tests don't try to call real Cloudinary
-vi.mock("../util/cloudinary-cleanup", () => ({
+vi.mock("../src/util/cloudinary-cleanup.ts", () => ({
   deleteCloudinaryImage: vi.fn().mockResolvedValue(undefined),
   extractPublicId: vi.fn().mockReturnValue(null),
 }));
