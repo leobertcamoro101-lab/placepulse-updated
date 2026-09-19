@@ -1,6 +1,6 @@
 import express from "express";
 import { validateBody } from "../middleware/validate-zod";
-import { signupSchema, updateProfileSchema } from "../schemas/user-schemas";
+import { signupSchema, updateProfileSchema, resetPasswordSchema, changePasswordSchema } from "../schemas/user-schemas";
 import rateLimit from "express-rate-limit";
 
 import * as usersControllers from "../controllers/users-controllers";
@@ -37,7 +37,12 @@ router.post(
   usersControllers.signup
 );
 router.post("/login", authLimiter, usersControllers.login);
-router.post("/forgot-password", forgotPasswordLimiter, usersControllers.forgotPassword);
+router.post(
+  "/forgot-password", 
+  forgotPasswordLimiter, 
+  [validateBody(resetPasswordSchema)],
+  usersControllers.forgotPassword
+);
 router.post("/reset-password", authLimiter, usersControllers.resetPassword);
 
 // Everything below this line requires a valid token
@@ -53,6 +58,10 @@ router.patch(
   usersControllers.updateProfile
 );
 
-router.patch("/:uid/password", usersControllers.changePassword);
+router.patch(
+  "/:uid/password", 
+   [validateBody(changePasswordSchema)],
+  usersControllers.changePassword
+);
 
 export default router;

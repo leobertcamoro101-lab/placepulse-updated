@@ -14,6 +14,8 @@ import usersRoutes from "./routes/users-routes";
 import HttpError from "./models/http-error";
 
 const app = express();
+app.set("trust proxy", 1);
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
@@ -38,6 +40,19 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
   if (req.body) {
     req.body = mongoSanitize.sanitize(req.body);
+  }
+
+  if (req.params) {
+    const sanitized = mongoSanitize.sanitize(req.params);
+    for (const key of Object.keys(sanitized)) {
+      (req.params as any)[key] = sanitized[key];
+    }
+  }
+  if (req.query) {
+    const sanitized = mongoSanitize.sanitize(req.query);
+    for (const key of Object.keys(sanitized)) {
+      (req.query as any)[key] = sanitized[key];
+    }
   }
   next();
 });
