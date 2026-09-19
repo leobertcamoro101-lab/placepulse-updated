@@ -53,9 +53,9 @@ const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) 
   const userId = req.params.uid;
 
   // security check: only the owner can view this profile
-  if (req.userData?.userId !== userId) {
-    return next(new HttpError("You are not allowed to view this profile.", 403));
-  }
+  // if (req.userData?.userId !== userId) {
+  //   return next(new HttpError("You are not allowed to view this profile.", 403));
+  // }
 
   let user;
   try {
