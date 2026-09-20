@@ -3,7 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import { AuthContext } from './shared/context/auth-context';
 import { LoadingProvider } from './shared/context/LoadingProvider';
 import { useAuth } from './shared/hooks/auth-hook';
-import router from './router';
+import router from './router/router';
 
 const App = () => {
   const { token, login, logout, userId, name, image, updateUserInfo } = useAuth();

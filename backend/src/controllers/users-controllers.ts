@@ -52,7 +52,7 @@ const getUsers = async (req: AuthRequest, res: Response, next: NextFunction) => 
 const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const userId = req.params.uid;
 
-  // security check: only the owner can view this profile
+  // security check: only the owner can view this profile // commented because it above the checkAuth if you see users-routes.ts
   // if (req.userData?.userId !== userId) {
   //   return next(new HttpError("You are not allowed to view this profile.", 403));
   // }

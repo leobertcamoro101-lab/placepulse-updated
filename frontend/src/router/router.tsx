@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
 
-import RootLayout from './shared/components/Navigation/RootLayout';
-import RequireAuth from './shared/components/Navigation/RequireAuth';
-import RedirectIfAuthenticated from './shared/components/Navigation/RedirectIfAuthenticated';
+import RootLayout from '../shared/components/Navigation/RootLayout';
+import RequireAuth from '../shared/components/Navigation/RequireAuth';
+import RedirectIfAuthenticated from '../shared/components/Navigation/RedirectIfAuthenticated';
 import { Users, NewPlace, UserPlaces, UpdatePlace, Auth, ForgotPassword, ResetPassword, Profile, EditProfile, ChangePassword, Places } from './routes-config';
-import RouteErrorBoundary from './shared/components/UIElements/RouteErrorBoundary';
+import RouteErrorBoundary from '../shared/components/UIElements/RouteErrorBoundary';
 
 const routes: RouteObject[] = [
   {
