@@ -147,9 +147,9 @@ function Auth() {
                   id="firstName"
                   type="text"
                   placeholder="First name"
+                  autoComplete="given-name"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
-                  autoComplete="given-name"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-base focus:outline-none focus:border-blue-500"
                 />
                 <Input
@@ -157,9 +157,9 @@ function Auth() {
                   id="lastName"
                   type="text"
                   placeholder="Last name"
+                  autoComplete="family-name"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
-                  autoComplete="family-name"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-base focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -167,16 +167,16 @@ function Auth() {
 
             {!isLoginMode && (
               <>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label htmlFor="birthday" className="block text-sm font-semibold text-gray-700 mb-1">
                   Birthday
                 </label>
                 <Input
                   element="input"
                   id="birthday"
                   type="date"
+                  autoComplete="bday"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
-                  autoComplete="bday"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
                 />
               </>
@@ -184,7 +184,7 @@ function Auth() {
 
             {!isLoginMode && (
               <>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-1">
                   Gender
                 </label>
                 <Input
@@ -213,9 +213,9 @@ function Auth() {
               id="email"
               type="email"
               placeholder="Mobile number or email"
+              autoComplete="email"
               validators={[VALIDATOR_EMAIL()]}
               onInput={inputHandler}
-              autoComplete="email"
               className="w-full rounded-full bg-white border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
             />
             <Input
@@ -223,9 +223,9 @@ function Auth() {
               id="password"
               type="password"
               placeholder="Password"
+              autoComplete={isLoginMode ? "current-password" : "new-password"}
               validators={[VALIDATOR_MINLENGTH(6)]}
               onInput={inputHandler}
-               autoComplete={isLoginMode ? "current-password" : "new-password"}
               className="w-full rounded-full bg-white border border-gray-300 px-4 py-3 mb-4 text-base focus:outline-none focus:border-blue-500"
             />
 
