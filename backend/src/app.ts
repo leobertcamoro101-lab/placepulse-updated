@@ -19,7 +19,24 @@ app.set("trust proxy", 1);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-app.use(helmet());
+app.use(helmet(
+  {
+    contentSecurityPolicy: {
+      directives: {
+        // This governs only the JSON API and the /views/places EJS page.
+        // The React SPA is a separate origin on Vercel with its own CSP
+        // (see frontend/vercel.json) — this one has no effect there.
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+  })
+);
 app.use(
   pinoHttp({ 
     logger,
