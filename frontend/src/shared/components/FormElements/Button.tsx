@@ -25,7 +25,7 @@ function Button({
   inverse,
   danger,
   disabled,
-  type,
+  type = 'button',
   onClick,
   className,
   children,
