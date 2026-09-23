@@ -49,6 +49,7 @@ interface InputProps {
   errorText?: string;
   className?: string;
   options?: SelectOption[];
+  autoComplete?: string;
 }
 
 function Input({
@@ -65,6 +66,7 @@ function Input({
   errorText,
   className,
   options, // NEW — array of { value, label } for element="select"
+  autoComplete,
 }: InputProps) {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: initialValue,
@@ -115,6 +117,7 @@ function Input({
         onBlur={touchHandler}
         value={value}
         className={computedInputClasses}
+        autoComplete={autoComplete}
       />
     );
   } else if (elementType === 'select') {

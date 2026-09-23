@@ -149,6 +149,7 @@ function Auth() {
                   placeholder="First name"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
+                  autoComplete="given-name"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-base focus:outline-none focus:border-blue-500"
                 />
                 <Input
@@ -158,6 +159,7 @@ function Auth() {
                   placeholder="Last name"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
+                  autoComplete="family-name"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 text-base focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -174,6 +176,7 @@ function Auth() {
                   type="date"
                   validators={[VALIDATOR_REQUIRE()]}
                   onInput={inputHandler}
+                  autoComplete="bday"
                   className="w-full rounded-lg bg-white border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
                 />
               </>
@@ -212,6 +215,7 @@ function Auth() {
               placeholder="Mobile number or email"
               validators={[VALIDATOR_EMAIL()]}
               onInput={inputHandler}
+              autoComplete="email"
               className="w-full rounded-full bg-white border border-gray-300 px-4 py-3 mb-3 text-base focus:outline-none focus:border-blue-500"
             />
             <Input
@@ -221,6 +225,7 @@ function Auth() {
               placeholder="Password"
               validators={[VALIDATOR_MINLENGTH(6)]}
               onInput={inputHandler}
+               autoComplete={isLoginMode ? "current-password" : "new-password"}
               className="w-full rounded-full bg-white border border-gray-300 px-4 py-3 mb-4 text-base focus:outline-none focus:border-blue-500"
             />
 
