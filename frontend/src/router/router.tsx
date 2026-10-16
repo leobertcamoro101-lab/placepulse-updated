@@ -24,8 +24,11 @@ const routes: RouteObject[] = [
           </RedirectIfAuthenticated>
         ),
       },
-      { path: "users", element: <Users /> },
-      { path: ":userId/places", element: <UserPlaces /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password/:token", element: <ResetPassword /> },
+      // { path: "*", element: <Navigate to="/" replace /> }, // commented to take effect RouteErrorBoundary
+      { path: "users", element: <RequireAuth><Users /></RequireAuth> },
+      { path: ":userId/places", element:  <RequireAuth><UserPlaces /></RequireAuth> },
       {
         path: "places/new",
         element: (
@@ -42,9 +45,6 @@ const routes: RouteObject[] = [
           </RequireAuth>
         ),
       },
-      // { path: "*", element: <Navigate to="/" replace /> }, // commented to take effect RouteErrorBoundary
-      { path: "forgot-password", element: <ForgotPassword /> },
-      { path: "reset-password/:token", element: <ResetPassword /> },
       {
         path: "profile",
         element: (
