@@ -1,4 +1,8 @@
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
+import { 
+  createBrowserRouter, 
+  // Navigate
+  RouteObject,
+} from 'react-router-dom';
 
 import RootLayout from '../shared/components/Navigation/RootLayout';
 import RequireAuth from '../shared/components/Navigation/RequireAuth';
@@ -38,7 +42,7 @@ const routes: RouteObject[] = [
           </RequireAuth>
         ),
       },
-      { path: "*", element: <Navigate to="/" replace /> },
+      // { path: "*", element: <Navigate to="/" replace /> }, // commented to take effect RouteErrorBoundary
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "reset-password/:token", element: <ResetPassword /> },
       {
