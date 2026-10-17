@@ -14,7 +14,7 @@ const routes: RouteObject[] = [
   {
     path: "/",
     element: <RootLayout />,
-    errorElement: <RouteErrorBoundary/>,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         index: true,
@@ -27,8 +27,22 @@ const routes: RouteObject[] = [
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "reset-password/:token", element: <ResetPassword /> },
       // { path: "*", element: <Navigate to="/" replace /> }, // commented to take effect RouteErrorBoundary
-      { path: "users", element: <RequireAuth><Users /></RequireAuth> },
-      { path: ":userId/places", element:  <RequireAuth><UserPlaces /></RequireAuth> },
+      {
+        path: "users",
+        element: (
+          <RequireAuth>
+            <Users />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: ":userId/places",
+        element: (
+          <RequireAuth>
+            <UserPlaces />
+          </RequireAuth>
+        ),
+      },
       {
         path: "places/new",
         element: (
@@ -69,7 +83,14 @@ const routes: RouteObject[] = [
           </RequireAuth>
         ),
       },
-      { path: "places", element: <Places /> },
+      {
+        path: "places",
+        element: (
+          <RequireAuth>
+            <Places />{" "}
+          </RequireAuth>
+        ),
+      },
     ],
   },
 ];
