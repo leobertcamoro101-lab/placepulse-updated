@@ -39,6 +39,8 @@ export default defineConfig({
       port: 5000,
       timeout: 120000,
       reuseExistingServer: false,
+      stdout: "pipe",
+      stderr: "pipe", 
       // Overrides DB_NAME for this spawned process only — dotenv never
       // overwrites a variable that's already set in the environment, so
       // this wins over whatever DB_NAME your backend/.env has, without
