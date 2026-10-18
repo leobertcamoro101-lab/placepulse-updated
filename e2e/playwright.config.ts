@@ -53,11 +53,15 @@ export default defineConfig({
       },
     },
     {
-      command: "npm run dev",
+      command: process.env.CI
+        ? "npm run build && npm run preview -- --host 127.0.0.1 --port 5173"
+        : "npm run dev",
       cwd: "../frontend",
       url: "http://127.0.0.1:5173",
-      timeout: 120000,
+      timeout: 180000,
       reuseExistingServer: false,
+      stdout: "pipe",
+      stderr: "pipe",
     },
   ],
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
