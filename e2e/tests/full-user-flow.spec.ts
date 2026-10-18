@@ -12,7 +12,13 @@ test("a user can sign up, create a place, and see it in their feed", async ({ pa
   // suite — give the whole flow more room than Playwright's 30s default.
   test.setTimeout(90000);
 
+  page.on("pageerror", (e) => console.log("PAGEERROR:", e.message));
+  page.on("console", (m) => m.type() === "error" && console.log("CONSOLE:", m.text()));
+  page.on("requestfailed", (r) => console.log("REQFAILED:", r.url(), r.failure()?.errorText));
+
   await page.goto("/auth");
+  console.log("URL:", page.url());
+  await expect(page.getByRole("button", { name: /log in/i })).toBeVisible({ timeout: 10000 });
 
   // Switch to signup mode
   await page.getByRole("button", { name: /create new account/i }).click();

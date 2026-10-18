@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
-  reporter: "html",
+  reporter: process.env.CI ? [["list"], ["html"]] : "html",
   // Refuses to run any test if the backend isn't confirmed connected to
   // the dedicated E2E database — see global-setup.ts.
   globalSetup: "./global-setup.ts",
@@ -14,8 +14,9 @@ export default defineConfig({
     // as its Origin header, unlike webServer.url below which is just
     // Playwright polling from Node and has no CORS concept.
     baseURL: "http://localhost:5173",
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    actionTimeout: 10000,
   },
   // Always spawn fresh servers, both locally and in CI — never reuse an
   // already-running one. This is deliberate: reusing an existing backend
@@ -44,6 +45,9 @@ export default defineConfig({
       // editing that file or affecting normal `npm run dev` elsewhere.
       env: {
         DB_NAME: "playwright_e2e",
+        MONGODB_URI: process.env.MONGODB_URI!,
+        JWT_KEY: process.env.JWT_KEY!,
+        VITE_API_URL: "http://localhost:5000"
       },
     },
     {
