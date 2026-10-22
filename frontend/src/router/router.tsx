@@ -24,6 +24,14 @@ const routes: RouteObject[] = [
           </RedirectIfAuthenticated>
         ),
       },
+      {
+        path: "auth",
+        element: (
+          <RedirectIfAuthenticated>
+            <Auth />
+          </RedirectIfAuthenticated>
+        ),
+      },
       { path: "forgot-password", element: <ForgotPassword /> },
       { path: "reset-password/:token", element: <ResetPassword /> },
       // { path: "*", element: <Navigate to="/" replace /> }, // commented to take effect RouteErrorBoundary

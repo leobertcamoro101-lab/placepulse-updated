@@ -17,12 +17,7 @@ test("a user can sign up, create a place, and see it in their feed", async ({ pa
   page.on("requestfailed", (r) => console.log("REQFAILED:", r.url(), r.failure()?.errorText));
 
   await page.goto("/auth");
-  console.log("URL:", page.url())
-  await page.waitForTimeout(3000);
-  console.log("BODY:", (await page.locator("body").innerText()).slice(0, 800));
-  console.log("HTML:", (await page.content()).slice(0, 2000));
-  await expect(page.getByRole("button", { name: /log in/i })).toBeVisible({ timeout: 10000 });;
-    
+  await expect(page.getByRole("button", { name: /log in/i })).toBeVisible({ timeout: 10000 });
 
   // Switch to signup mode
   await page.getByRole("button", { name: /create new account/i }).click();

@@ -47,8 +47,8 @@ export default defineConfig({
       // editing that file or affecting normal `npm run dev` elsewhere.
       env: {
         DB_NAME: "playwright_e2e",
-        MONGODB_URI: process.env.MONGODB_URI!,
-        JWT_KEY: process.env.JWT_KEY!,
+        MONGO_URI: process.env.MONGO_URI || process.env.MONGODB_URI || "",
+        JWT_KEY: process.env.JWT_KEY || "",
         VITE_API_URL: "http://localhost:5000"
       },
     },
